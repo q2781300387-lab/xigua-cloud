@@ -1,6 +1,12 @@
 const path = require('path')
+const fs = require('fs')
 process.env.UNI_INPUT_DIR = path.resolve(__dirname, 'src')
 process.env.UNI_CLI_CONTEXT = process.cwd()
+
+// 本地开发时共享核心在 ../packages/xigua-core，仓库内位于 ../shared-core
+const sharedCore = fs.existsSync(path.resolve(__dirname, '..', 'shared-core', 'src'))
+	? path.resolve(__dirname, '..', 'shared-core', 'src')
+	: path.resolve(__dirname, '..', 'packages', 'xigua-core', 'src')
 
 module.exports = {
 	devServer: {
@@ -32,7 +38,7 @@ module.exports = {
 	chainWebpack: (config) => {
 		config.resolve.alias.set(
 			'@xigua/core',
-			path.resolve(__dirname, '..', 'packages', 'xigua-core', 'src')
+			sharedCore
 		)
 	}
 }

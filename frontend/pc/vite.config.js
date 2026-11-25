@@ -5,6 +5,12 @@ import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import compression from 'vite-plugin-compression'
 import path from 'path'
+import fs from 'node:fs'
+
+// 本地开发时共享核心在 ../packages/xigua-core，仓库内位于 ../shared-core
+const sharedCore = fs.existsSync(path.resolve('../shared-core/src'))
+  ? path.resolve('../shared-core/src')
+  : path.resolve('../packages/xigua-core/src')
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -27,7 +33,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve("./src"), // 相对路径别名配置，使用 @ 代替 src
-      "@xigua/core": path.resolve("../packages/xigua-core/src")
+      "@xigua/core": sharedCore
     }
   },
 
