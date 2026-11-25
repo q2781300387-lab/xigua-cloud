@@ -22,7 +22,7 @@ jobs:
           java-version: '17'
           cache: maven
       - name: Compile and run file security tests
-        run: mvn -B -Plocal -pl xigua-client -am test -Dtest=FileSecurityPolicyTest -Dsurefire.failIfNoSpecifiedTests=false
+        run: mvn -B -ntp -s .github/maven-settings.xml -Dmaven.wagon.http.retryHandler.count=3 -Plocal -pl xigua-client -am test -Dtest=FileSecurityPolicyTest -Dsurefire.failIfNoSpecifiedTests=false
 
   pc-build:
     runs-on: ubuntu-latest

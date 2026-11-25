@@ -6,6 +6,7 @@
   "scripts": {
     "dev:h5": "vue-cli-service uni-serve",
     "build:h5": "vue-cli-service uni-build",
+    "postinstall": "node scripts/patch-uni-vue-loader.js",
     "dev:mp-weixin": "vue-cli-service uni-build --watch --platform mp-weixin",
     "build:mp-weixin": "vue-cli-service uni-build --platform mp-weixin"
   },
