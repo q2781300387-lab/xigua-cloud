@@ -1,0 +1,63 @@
+name: xigua-ci
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: xigua-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Compile and run file security tests
+        run: mvn -B -Plocal -pl xigua-client -am test -Dtest=FileSecurityPolicyTest -Dsurefire.failIfNoSpecifiedTests=false
+
+  pc-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/pc/package-lock.json
+      - name: Install dependencies
+        working-directory: frontend/pc
+        run: npm ci
+      - name: Build PC web
+        working-directory: frontend/pc
+        run: npm run build
+
+  mobile-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/mobile/package-lock.json
+      - name: Install dependencies
+        working-directory: frontend/mobile
+        run: npm ci
+      - name: Build mobile H5
+        working-directory: frontend/mobile
+        env:
+          UNI_CLI_CONTEXT: ${{ github.workspace }}/frontend/mobile
+          UNI_PLATFORM: h5
+          NODE_ENV: production
+        run: npm run build:h5
