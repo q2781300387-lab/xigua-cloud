@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script>
+      var coverSupport = 'CSS' in window && typeof CSS.supports === 'function' && (CSS.supports('top: env(a)') ||
+        CSS.supports('top: constant(a)'))
+      document.write(
+        '<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0' +
+        (coverSupport ? ', viewport-fit=cover' : '') + '" />')
+    </script>
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <link rel="icon" href="/static/logo.png" type="image/png">
+    <!-- uni-app H5 基础组件样式（uni-image / uni-actionsheet / uni-modal 等） -->
+    <link rel="stylesheet" href="/static/index.css" onerror="this.remove()">
+    <style>
+      html, body { margin: 0; background: #f5f7fa; }
+      #boot-splash {
+        position: fixed; inset: 0; z-index: 99999;
+        display: flex; align-items: center; justify-content: center;
+        background:
+          radial-gradient(900px 520px at 8% 4%, rgba(59,130,246,.14), transparent 62%),
+          radial-gradient(760px 480px at 96% 96%, rgba(34,197,94,.12), transparent 62%),
+          #f5f7fa;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+      .boot-card {
+        width: min(84vw, 320px); padding: 36px 28px 30px; border-radius: 24px;
+        background: rgba(255,255,255,.74); border: 1px solid rgba(255,255,255,.9);
+        box-shadow: 0 24px 70px rgba(15,23,42,.10); backdrop-filter: blur(18px);
+        text-align: center;
+      }
+      .boot-card img { display: block; width: 148px; max-width: 78%; height: auto; margin: 0 auto 22px; }
+      .boot-bar { height: 4px; border-radius: 999px; background: #e6edf7; overflow: hidden; }
+      .boot-bar i {
+        display: block; width: 38%; height: 100%; border-radius: 999px;
+        background: linear-gradient(90deg, #3b82f6, #22c55e);
+        animation: boot-slide 1.15s ease-in-out infinite;
+      }
+      .boot-text { margin-top: 13px; color: #7b879b; font-size: 13px; line-height: 1.5; letter-spacing: .04em; }
+      @keyframes boot-slide {
+        0% { transform: translateX(-110%); }
+        100% { transform: translateX(300%); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-bar i { animation: none; width: 100%; }
+      }
+    </style>
+    <!--preload-links-->
+    <!--app-context-->
+  </head>
+  <body>
+    <div id="app">
+      <div id="boot-splash" aria-label="页面加载中">
+        <div class="boot-card">
+          <img src="/static/brand-lockup.png" alt="西瓜IM" />
+          <div class="boot-bar"><i></i></div>
+          <div class="boot-text">正在进入工作空间…</div>
+        </div>
+      </div>
+      <!--app-html-->
+    </div>
+    <script>
+      (function () {
+        if (!('serviceWorker' in navigator)) return;
+        navigator.serviceWorker.register('/static/sw.js', { scope: '/' }).catch(function () {});
+      })();
+    </script>
+  </body>
+</html>
+

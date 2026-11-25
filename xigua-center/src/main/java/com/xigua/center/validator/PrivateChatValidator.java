@@ -21,7 +21,7 @@ public class PrivateChatValidator implements MessagePermissionValidator {
 
     @Override
     public ChatType supportChatType() {
-        return ChatType.ONE;
+        return ChatType.PRIVATE;
     }
 
     @Override

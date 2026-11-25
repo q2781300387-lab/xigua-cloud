@@ -1,0 +1,2 @@
+com.xigua.common.docker.config.DockerAutoConfiguration
+com.xigua.common.docker.client.DockerClient

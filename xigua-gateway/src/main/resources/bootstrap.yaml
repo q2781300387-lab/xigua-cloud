@@ -15,6 +15,12 @@ spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   cloud:
+    # 网关转发聊天 WebSocket 时放宽帧上限：业务允许 20000 字符消息，
+    # 默认 8KB 会把长消息以 1009 直接断开，前端表现为发送瞬间掉线
+    gateway:
+      httpclient:
+        websocket:
+          max-frame-payload-length: 131072
     nacos:
       server-addr: @nacos.server@
       username: @nacos.username@

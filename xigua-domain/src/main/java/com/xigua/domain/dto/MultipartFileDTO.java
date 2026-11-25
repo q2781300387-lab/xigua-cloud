@@ -18,25 +18,25 @@ public class MultipartFileDTO implements Serializable {
     /**
      * 源文件名称
      */
-    @Schema(name = "源文件名称")
+    @Schema(description = "源文件名称")
     private String originalFilename;
 
 
     /**
      * 媒体类型
      */
-    @Schema(name = "媒体类型")
+    @Schema(description = "媒体类型")
     private String contentType;
 
     /**
      * 文件大小
      */
-    @Schema(name = "文件大小")
+    @Schema(description = "文件大小")
     private Long size;
 
     /**
      * 字节数组
      */
-    @Schema(name = "字节数组")
+    @Schema(description = "字节数组")
     private byte[] bytes;
 }

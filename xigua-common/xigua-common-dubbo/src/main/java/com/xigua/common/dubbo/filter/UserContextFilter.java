@@ -3,6 +3,7 @@ package com.xigua.common.dubbo.filter;
 import com.alibaba.fastjson2.JSONObject;
 import com.xigua.common.core.util.UserContext;
 import com.xigua.common.core.model.UserToken;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.constants.CommonConstants;
 import org.apache.dubbo.common.extension.Activate;
@@ -14,6 +15,7 @@ import org.apache.dubbo.rpc.*;
  * @Author wangjinfei
  * @Date 2024/10/5 9:19
  */
+@Slf4j
 @Activate(group = {CommonConstants.CONSUMER, CommonConstants.PROVIDER})
 public class UserContextFilter implements Filter {
 
@@ -33,6 +35,7 @@ public class UserContextFilter implements Filter {
                 // 隐式传参
                 RpcContext.getContext().setAttachment("userInfo", JSONObject.toJSONString(userToken));
             }
+            return invoker.invoke(invocation);
         }
 
         if (RpcContext.getContext().isProviderSide()) {
@@ -41,6 +44,15 @@ public class UserContextFilter implements Filter {
                 // 将用户信息放入 ThreadLocal
                 UserToken userToken = JSONObject.parseObject(userInfo, UserToken.class);
                 UserContext.set(userToken);
+
+                try {
+                    return invoker.invoke(invocation);
+                } catch (Exception e) {
+                    log.error("---->>>>>[dubbo] 服务调用异常：", e);
+                    throw e;
+                }finally {
+                    UserContext.clear();
+                }
             }
         }
         return invoker.invoke(invocation);

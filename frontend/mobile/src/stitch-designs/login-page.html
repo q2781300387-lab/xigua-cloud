@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>IM Messenger - 登录</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "primary": "#32ABFD",
+                "on-primary": "#ffffff",
+                "surface": "#ffffff",
+                "background": "#ffffff",
+                "on-surface": "#1e1b13",
+                "on-surface-variant": "#6f7882",
+                "outline": "#e9e2d4",
+                "outline-variant": "#bec7d3",
+                "surface-container-low": "#ffffff",
+                "surface-container-high": "#F8F9FA"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "1.0rem",
+                "2xl": "1.5rem",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline": ["Manrope", "sans-serif"],
+                "body": ["Plus Jakarta Sans", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .soft-shadow {
+            box-shadow: 0px 4px 12px rgba(50, 171, 253, 0.15);
+        }
+        .touch-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        .bg-gradient-bottom {
+            background: linear-gradient(180deg, rgba(255,255,255,0) 60%, rgba(50, 171, 253, 0.08) 100%);
+        }
+    </style>
+</head>
+<body class="bg-white flex flex-col items-center bg-gradient-bottom">
+<main class="w-full max-w-md px-8 pt-24 pb-12 flex-1 flex flex-col">
+<!-- Brand Identity Section -->
+<header class="text-center mb-10">
+<h1 class="font-headline font-bold text-3xl tracking-tight text-on-surface mb-2">登录</h1>
+<p class="font-body text-on-surface-variant font-medium">欢迎使用</p>
+</header>
+<!-- Login Form Canvas -->
+<div class="space-y-6">
+<!-- Email/Username Input -->
+<div class="space-y-2">
+<label class="font-body text-xs font-bold text-on-surface ml-1">邮箱/用户名</label>
+<div class="relative group">
+<input class="w-full touch-target bg-surface-container-high border-none rounded-2xl py-4 px-12 text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder:text-outline-variant font-body" placeholder="请输入邮箱或用户名" type="text"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors" data-icon="person">person</span>
+</div>
+</div>
+<!-- Password Input -->
+<div class="space-y-2">
+<div class="flex justify-between items-center ml-1">
+<label class="font-body text-xs font-bold text-on-surface">密码</label>
+<a class="font-body text-xs text-primary font-bold hover:opacity-80 transition-opacity px-2" href="#">忘记密码？</a>
+</div>
+<div class="relative group">
+<input class="w-full touch-target bg-surface-container-high border-none rounded-2xl py-4 px-12 text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder:text-outline-variant font-body" placeholder="请输入密码" type="password"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors" data-icon="lock">lock</span>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant cursor-pointer hover:text-on-surface touch-target flex items-center justify-center" data-icon="visibility">visibility</span>
+</div>
+</div>
+<!-- Primary Action -->
+<div class="pt-4">
+<button class="w-full touch-target bg-primary hover:bg-[#2998e3] py-4 rounded-full text-on-primary font-headline font-bold text-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all">
+                    登录
+                </button>
+</div>
+<!-- Social Entry -->
+<div class="space-y-8 pt-4">
+<div class="flex items-center space-x-4">
+<div class="h-[1px] flex-1 bg-[#F1F3F5]"></div>
+<span class="font-body text-[10px] text-outline-variant uppercase tracking-[0.2em]">其他方式登录</span>
+<div class="h-[1px] flex-1 bg-[#F1F3F5]"></div>
+</div>
+<div class="flex justify-center space-x-8">
+<button class="w-12 h-12 rounded-full border border-[#F1F3F5] bg-white flex items-center justify-center hover:bg-surface-container-high transition-colors active:scale-95 touch-target">
+<img alt="google logo" class="w-5 h-5 opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5ZEA6bHY0YU-TUf6QHT5gCQKmkArDDt5U-gc4J7wkVbHfUsv58IgivqfdeXjjJKbAzjh9hvvp7nR0hlWuJ_cJcyJSqQ40pVJLyhsRtoHia-59vBJQXl_b77fcIlq2uSLGH2Sz9iHez_vuyOeV5XX8hlBrVF5sHphzGH7tlgiEdcl9-_iccWEMteJthz7iNQKBp-PwvuQ4e71mVID3ffm_STyUuz0LIU7xpjk3pzt65QLFyHRLl-We_e3pHstCz1Y-ZWDu-WNVhoM"/>
+</button>
+<button class="w-12 h-12 rounded-full border border-[#F1F3F5] bg-white flex items-center justify-center hover:bg-surface-container-high transition-colors active:scale-95 touch-target">
+<span class="material-symbols-outlined text-on-surface text-xl" data-icon="apple">apple</span>
+</button>
+<button class="w-12 h-12 rounded-full border border-[#F1F3F5] bg-white flex items-center justify-center hover:bg-surface-container-high transition-colors active:scale-95 touch-target">
+<span class="material-symbols-outlined text-[#07C160] text-xl" data-icon="wechat">chat</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Secondary Navigation -->
+<footer class="mt-auto pt-12 text-center">
+<p class="font-body text-sm text-on-surface-variant">
+                还没有账号？ 
+                <a class="text-primary font-bold hover:underline underline-offset-8 ml-1 touch-target inline-flex items-center" href="#">立即注册</a>
+</p>
+</footer>
+</main>
+</body></html>

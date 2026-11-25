@@ -53,6 +53,13 @@ public class MessageResponse implements Serializable {
     private Integer chatType;
 
     /**
+     * 消息类型
+     * 目前只对chat的发送和接收有用
+     * @see com.xigua.domain.enums.ContentType
+     */
+    private Integer contentType;
+
+    /**
      * 创建时间
      */
     private String createTime;
@@ -61,4 +68,29 @@ public class MessageResponse implements Serializable {
      * 聊天消息id
      */
     private String chatMessageId;
+
+    /**
+     * 客户端消息id（原样回传，供发送端精确匹配）
+     */
+    private String clientMsgId;
+
+    /**
+     * 引用的消息id
+     */
+    private String replyToId;
+
+    /**
+     * 引用消息内容快照
+     */
+    private String replyContent;
+
+    /**
+     * @提及的用户id列表（JSON数组字符串）
+     */
+    private String atUsers;
+
+    /**
+     * 呼叫id
+     */
+    private String callId;
 }

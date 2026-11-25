@@ -1,6 +1,7 @@
 package com.xigua.ai.agent;
 
 import com.xigua.ai.agent.model.AgentContext;
+import org.springframework.http.codec.ServerSentEvent;
 import reactor.core.publisher.Flux;
 
 /**
@@ -13,5 +14,5 @@ public interface Agent {
     /**
      * 执行一次智能任务（完整的感知→推理→执行→输出流程）
      */
-    Flux<String> process(AgentContext agentContext);
+    Flux<ServerSentEvent<String>> process(AgentContext agentContext);
 }

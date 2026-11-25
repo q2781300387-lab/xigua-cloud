@@ -12,6 +12,7 @@ import java.io.Serializable;
  * @Date 2025/10/1 15:19
  */
 @Data
+@Schema(description = "机器人DTO")
 public class BotDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 

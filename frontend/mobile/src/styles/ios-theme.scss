@@ -1,0 +1,307 @@
+/**
+ * 移动端 iOS 视觉基线
+ * 与桌面端保持同一套语言：黑白品牌、浅灰页面、白色卡片、玻璃顶栏、实体按钮。
+ */
+page {
+	--ios-bg: #f2f2f7;
+	--ios-card: #ffffff;
+	--ios-card-strong: #ffffff;
+	--ios-label: #1c1c1e;
+	--ios-label-secondary: rgba(60, 60, 67, 0.6);
+	--ios-label-tertiary: rgba(60, 60, 67, 0.38);
+	--ios-separator: rgba(60, 60, 67, 0.12);
+	--ios-fill: rgba(120, 120, 128, 0.12);
+	--ios-fill-strong: rgba(120, 120, 128, 0.2);
+	--ios-accent: #111111;
+	--ios-danger: #d92d20;
+	--ios-radius: 14px;
+	--ios-radius-lg: 18px;
+
+	background-color: var(--ios-bg);
+	color: var(--ios-label);
+	font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC',
+		'Helvetica Neue', Arial, sans-serif;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* H5 下 uni-view 默认是 inline，会让白卡宽度按内容收缩、背景只画一条 */
+uni-view {
+	display: block;
+}
+
+/* H5 原生输入框的清除按钮是系统蓝，统一隐藏，改用页面自己的清除按钮 */
+.uni-input-clear,
+.uni-input-eye,
+input[type="search"]::-webkit-search-cancel-button,
+input::-ms-clear {
+	display: none !important;
+	-webkit-appearance: none;
+}
+
+/* 原生输入框在 H5 / 小程序里的默认边框会让搜索框出现白色内块 */
+input,
+textarea,
+.uni-input-input,
+.uni-textarea-textarea {
+	border: 0 !important;
+	outline: 0 !important;
+	box-shadow: none !important;
+	background: transparent !important;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+	color: var(--ios-label-tertiary);
+}
+
+/* uni-app H5 的 textarea 内层默认撑满父级，会把聊天输入条顶成一块大方块 */
+.input-wrapper .uni-textarea-wrapper,
+.input-wrapper .uni-textarea-textarea {
+	height: auto !important;
+	min-height: 0 !important;
+	max-height: 160rpx !important;
+	line-height: 1.4 !important;
+}
+
+/* H5 端 textarea 的占位层、测量层必须脱离文档流，否则会和真实输入框叠成三行高 */
+.uni-textarea-wrapper {
+	position: relative !important;
+}
+.uni-textarea-placeholder {
+	position: absolute !important;
+	top: 0;
+	left: 0;
+	right: 0;
+	pointer-events: none;
+}
+.uni-textarea-line {
+	display: none !important;
+}
+.uni-textarea-compute {
+	position: absolute !important;
+	top: 0;
+	left: 0;
+	right: 0;
+	visibility: hidden !important;
+}
+.uni-textarea-textarea {
+	display: block !important;
+	width: 100% !important;
+	min-height: 44rpx;
+	line-height: 1.4 !important;
+}
+
+page,
+uni-page-body,
+uni-page-wrapper,
+uni-page {
+	background-color: #f2f2f7 !important;
+}
+
+/* H5 下隐藏原生滚动条，保持 iOS 干净边界 */
+::-webkit-scrollbar,
+.uni-scroll-view::-webkit-scrollbar {
+	width: 0;
+	height: 0;
+	display: none;
+}
+
+/* 图片统一裁剪，避免 H5 内部 img 按原始尺寸溢出容器 */
+image,
+uni-image {
+	overflow: hidden;
+}
+
+/* H5 下 uni-image 内层 img 需要单独约束，否则只露出原图左上角 */
+.avatar img,
+.sheet-avatar img,
+.chat-avatar img,
+.contact-avatar img,
+.group-avatar img,
+.avatar-image img,
+.avatar-default img,
+.avatar-box img,
+.result-avatar img,
+.selected-avatar img {
+	width: 100% !important;
+	height: 100% !important;
+	object-fit: cover !important;
+	display: block !important;
+}
+
+.avatar-box uni-image,
+.result-avatar uni-image,
+.selected-avatar uni-image {
+	width: 100% !important;
+	height: 100% !important;
+	display: block !important;
+	overflow: hidden;
+}
+
+/* 统一玻璃顶栏 */
+.ios-glass-bar {
+	background: rgba(255, 255, 255, 0.78);
+	border-bottom: 1rpx solid var(--ios-separator);
+	backdrop-filter: saturate(180%) blur(20px);
+	-webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+/* 统一页面标题 */
+.ios-title {
+	font-size: 34rpx;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	color: var(--ios-label);
+}
+
+/* 统一分组卡片 */
+.ios-card {
+	background: var(--ios-card);
+	border-radius: var(--ios-radius-lg);
+	border: 1rpx solid var(--ios-separator);
+	overflow: hidden;
+}
+
+/* 统一分隔线 */
+.ios-divider {
+	height: 1rpx;
+	background: var(--ios-separator);
+}
+
+/* 统一实体按钮 */
+.ios-primary-btn {
+	background: var(--ios-accent);
+	color: #ffffff;
+	border-radius: 12px;
+	font-weight: 600;
+}
+
+.ios-secondary-btn {
+	background: var(--ios-fill);
+	color: var(--ios-label);
+	border-radius: 12px;
+	font-weight: 600;
+}
+
+/* H5 系统弹窗：uni-app 默认样式缺失时兜底为居中 iOS 弹窗 */
+uni-modal {
+	position: fixed !important;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 9999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+uni-modal .uni-mask {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 0.4);
+}
+
+uni-modal .uni-modal {
+	position: relative;
+	width: 300px;
+	max-width: 84vw;
+	margin: 0;
+	background: #ffffff;
+	border-radius: 16px;
+	overflow: hidden;
+	box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+}
+
+uni-modal .uni-modal__hd {
+	padding: 22px 20px 8px;
+	text-align: center;
+}
+
+uni-modal .uni-modal__title {
+	font-size: 17px;
+	font-weight: 600;
+	line-height: 1.35;
+	color: #1c1c1e;
+}
+
+uni-modal .uni-modal__bd {
+	padding: 0 20px 20px;
+	font-size: 14px;
+	line-height: 1.5;
+	text-align: center;
+	color: rgba(60, 60, 67, 0.72);
+}
+
+uni-modal .uni-modal__ft {
+	display: flex;
+	border-top: 1px solid rgba(60, 60, 67, 0.12);
+}
+
+uni-modal .uni-modal__btn {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 48px;
+	padding: 0 8px;
+	font-size: 16px;
+	line-height: 48px;
+	text-align: center;
+}
+
+uni-modal .uni-modal__btn + .uni-modal__btn {
+	border-left: 1px solid rgba(60, 60, 67, 0.12);
+}
+
+
+/* ==================== uni-app H5 操作菜单 ==================== */
+/* 基础样式在移动端会把操作菜单变成居中弹窗，这里恢复为底部动作面板 */
+@media screen and (max-width: 767px) {
+	uni-actionsheet .uni-actionsheet {
+		position: fixed !important;
+		left: 8px !important;
+		right: 8px !important;
+		top: auto !important;
+		bottom: 8px !important;
+		width: auto !important;
+		transform: translateY(100%) !important;
+		opacity: 1 !important;
+		visibility: hidden !important;
+		transition: transform 0.28s ease, visibility 0.28s !important;
+	}
+
+	uni-actionsheet .uni-actionsheet.uni-actionsheet_toggle {
+		transform: translateY(0) !important;
+		visibility: visible !important;
+	}
+
+	uni-actionsheet .uni-actionsheet__action {
+		display: block !important;
+		margin-top: 8px !important;
+		border-radius: 14px !important;
+		overflow: hidden !important;
+	}
+
+	uni-actionsheet .uni-actionsheet__menu {
+		border-radius: 14px !important;
+		overflow: hidden !important;
+		box-shadow: none !important;
+		background: #ffffff !important;
+	}
+
+	uni-actionsheet .uni-actionsheet__cell {
+		padding: 16px 8px !important;
+		font-size: 16px !important;
+		background: #ffffff !important;
+	}
+
+	uni-actionsheet .uni-actionsheet__cell:before {
+		border-top-color: rgba(60, 60, 67, 0.12) !important;
+	}
+}

@@ -1,6 +1,7 @@
 package com.xigua.common.core.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
  * @Date 2025/3/25 17:01
  */
 @Data
+@Builder
 public class UserToken implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -37,8 +39,7 @@ public class UserToken implements Serializable {
     private String phone;
 
     /**
-     * 过期时间
+     * 用户ua
      */
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime expireAt;
+    private String userAgent;
 }

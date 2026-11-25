@@ -4,13 +4,12 @@ import com.xigua.api.service.AuthService;
 import com.xigua.common.core.util.UserContext;
 import com.xigua.domain.dto.LoginDTO;
 import com.xigua.domain.dto.RegisterUserDTO;
-import com.xigua.domain.result.R;
+import com.xigua.common.core.base.R;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -60,6 +59,27 @@ public class AuthController {
     @PostMapping("/login")
     public R login(@Validated @RequestBody LoginDTO loginDTO){
         return R.ok(authService.login(loginDTO),"登录成功");
+    }
+
+    @Operation(summary = "登录风险状态")
+    @GetMapping("/login-risk")
+    public R loginRisk(@RequestParam(required = false) String username){
+        return R.ok(authService.loginRisk(username));
+    }
+
+    @Operation(summary = "获取登录验证码")
+    @GetMapping("/captcha")
+    public R captcha(@RequestParam(required = false) String username){
+        return R.ok(authService.captcha(username));
+    }
+
+    @Operation(summary = "登出成功")
+    @PostMapping("/logout")
+    public R logout(jakarta.servlet.http.HttpServletRequest request){
+        String userId = UserContext.get().getUserId();
+        String token = request.getHeader("xigua-token");
+        authService.logoutCurrent(userId, token);
+        return R.ok(null,"登出成功");
     }
 
     /**

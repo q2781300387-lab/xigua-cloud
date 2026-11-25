@@ -1,0 +1,404 @@
+/* ============================================================
+ * 玻璃主题层 · Aqua 风格移植（轻量版）· chat(5101)
+ * 门控：html[data-glass] 挂载生效，移除即 100% 还原原生外观。
+ * 变量由 src/glass/glass.js 在运行时写入。
+ * 浅色走白玻璃配方，暗色（data-theme="dark"）走中性冷灰玻璃配方。
+ * ============================================================ */
+
+/* ---------- 运行时变量（JS 写入） ---------- */
+:root {
+  --glass-c1: #7dd3fc;
+  --glass-c2: #bfdbfe;
+  --glass-c3: #eff6ff;
+  --glass-blur: 18px;
+  --glass-frost: 0.07;
+  --glass-brightness-w: 0;
+  --glass-brightness-b: 0;
+  --glass-wallpaper-blur: 0px;
+  --glass-wallpaper-frost: 0;
+}
+
+/* ---------- 玻璃材质配方（浅色） ---------- */
+html[data-glass] {
+  --glass-surface:
+    color-mix(in srgb, rgb(255 255 255) calc(42% * var(--glass-frost)), transparent);
+  --glass-surface-strong:
+    color-mix(in srgb, rgb(255 255 255) calc(58% * var(--glass-frost) + 24%), transparent);
+  --glass-surface-soft:
+    color-mix(in srgb, rgb(255 255 255) calc(30% * var(--glass-frost)), transparent);
+  --glass-fill: rgba(120, 120, 128, calc(0.14 * var(--glass-frost) + 0.04));
+  --glass-fill-hover: rgba(120, 120, 128, calc(0.2 * var(--glass-frost) + 0.06));
+  --glass-border: rgba(19, 45, 83, 0.26);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 10px 36px rgba(19, 45, 83, 0.16);
+}
+
+/* 暗色：中性冷灰（非蓝，防 frosted 显蓝块） */
+html[data-glass][data-theme="dark"] {
+  --glass-surface:
+    color-mix(in srgb, rgb(34 38 47) calc(50% * var(--glass-frost)), transparent);
+  --glass-surface-strong:
+    color-mix(in srgb, rgb(34 38 47) calc(62% * var(--glass-frost) + 18%), transparent);
+  --glass-surface-soft:
+    color-mix(in srgb, rgb(34 38 47) calc(36% * var(--glass-frost)), transparent);
+  --glass-fill: rgba(148, 180, 220, calc(0.16 * var(--glass-frost) + 0.04));
+  --glass-fill-hover: rgba(148, 180, 220, calc(0.24 * var(--glass-frost) + 0.06));
+  --glass-border: rgba(148, 180, 220, 0.32);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --glass-shadow: 0 10px 36px rgba(2, 6, 14, 0.5);
+}
+
+/* ============================================================
+ * 一、token 级玻璃覆盖 —— 消费这些变量的表面全部玻璃化
+ * ============================================================ */
+html[data-glass] {
+  --card: var(--glass-surface);
+  --bg: var(--glass-surface-soft);
+  --bg-blur: var(--glass-surface);
+  --bg-blur-strong: var(--glass-surface-strong);
+  --fill: var(--glass-fill);
+}
+
+/* ============================================================
+ * 二、外壳：桌面露出背景层 / 窗口与侧栏玻璃化
+ * ============================================================ */
+html[data-glass] .app-container {
+  background: transparent;
+}
+
+html[data-glass] .wechat-app {
+  background: var(--glass-surface);
+  /* 大容器不做 backdrop-filter：多层嵌套模糊在 Chromium 合成层会吞掉整个聊天区，
+     并且 375 窄屏/iframe 下直接白屏。用半透明底 + 高光/阴影保留玻璃观感。 */
+  box-shadow:
+    var(--glass-highlight),
+    0 28px 80px rgba(19, 45, 83, 0.24),
+    0 8px 24px rgba(19, 45, 83, 0.1);
+  border: 1px solid var(--glass-border);
+}
+
+html[data-glass] .menu-bar {
+  background: var(--glass-surface);
+  border-right-color: var(--glass-border);
+  box-shadow:
+    var(--glass-highlight),
+    0 10px 36px rgba(19, 45, 83, 0.14);
+}
+
+html[data-glass] .content-area {
+  background: var(--glass-surface-soft);
+}
+
+/* ============================================================
+ * 三、聊天气泡 / 输入区 / 头部玻璃化
+ * ============================================================ */
+html[data-glass] .message.receiver .content {
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight);
+}
+
+html[data-glass] .message.sender .content {
+  background: color-mix(
+    in srgb,
+    var(--bubble-outgoing) calc(42% * var(--glass-frost) + 30%),
+    rgb(255 255 255) calc(24% * var(--glass-frost))
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 8px 24px rgba(0, 122, 255, 0.28);
+}
+
+html[data-glass][data-theme="dark"] .message.sender .content {
+  background: color-mix(
+    in srgb,
+    var(--bubble-outgoing) calc(48% * var(--glass-frost) + 22%),
+    rgb(16 22 30)
+  );
+}
+
+html[data-glass] .chat-header,
+html[data-glass] .input-container,
+html[data-glass] .chat-input-area {
+  background: var(--glass-surface-strong);
+  /* 头部/输入区是固定大面板，不再叠加 backdrop-filter，避免与页面级玻璃层形成嵌套合成 */
+  border-bottom-color: transparent;
+  box-shadow: var(--glass-highlight);
+}
+
+html[data-glass] .input-container {
+  border-top-color: transparent;
+}
+
+html[data-glass] .chat-input {
+  background: var(--glass-fill);
+}
+
+/* 会话列表条目 hover 玻璃感 */
+html[data-glass] .chat-item:hover,
+html[data-glass] .menu-item:hover {
+  background: var(--glass-fill);
+}
+
+html[data-glass] .chat-item.active {
+  background: color-mix(in srgb, var(--accent) calc(10% * var(--glass-frost) + 8%), transparent);
+  box-shadow: var(--glass-highlight);
+}
+
+/* ============================================================
+ * 四、背景层（JS 注入到 body，z-index:-1 垫底）
+ * ============================================================ */
+.xg-glass-backdrop,
+.xg-glass-particles {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* 环境光晕（呼吸） */
+.xg-glass-ambient {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  animation: xg-glass-breathe 9s ease-in-out infinite alternate;
+}
+
+.xg-glass-ambient::before,
+.xg-glass-ambient::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.xg-glass-ambient::before {
+  top: -8%;
+  left: 50%;
+  width: 760px;
+  height: 420px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in srgb, var(--glass-c1) 26%, transparent),
+    transparent 70%
+  );
+}
+
+.xg-glass-ambient::after {
+  bottom: -12%;
+  left: 12%;
+  width: 620px;
+  height: 380px;
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in srgb, var(--glass-c2) 20%, transparent),
+    transparent 70%
+  );
+}
+
+html[data-glass][data-theme="dark"] .xg-glass-ambient::before {
+  background: radial-gradient(circle at 50% 50%, rgba(90, 160, 255, 0.14), transparent 70%);
+}
+
+@keyframes xg-glass-breathe {
+  from {
+    opacity: 0.72;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 流体：三团漂移光斑 */
+.xg-glass-fluid {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(64px);
+  mix-blend-mode: screen;
+  animation: xg-glass-drift 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.xg-glass-fluid.f1 {
+  left: -8%;
+  top: -6%;
+  width: 58%;
+  aspect-ratio: 1;
+  background: radial-gradient(circle at 40% 40%, var(--glass-c1), transparent 70%);
+  opacity: 0.72;
+}
+
+.xg-glass-fluid.f2 {
+  right: -10%;
+  top: 22%;
+  width: 52%;
+  aspect-ratio: 1;
+  background: radial-gradient(circle at 55% 45%, var(--glass-c2), transparent 70%);
+  opacity: 0.6;
+  animation-duration: 32s;
+  animation-delay: -8s;
+}
+
+.xg-glass-fluid.f3 {
+  left: 24%;
+  bottom: -14%;
+  width: 60%;
+  aspect-ratio: 1;
+  background: radial-gradient(circle at 50% 50%, var(--glass-c3), transparent 72%);
+  opacity: 0.66;
+  animation-duration: 38s;
+  animation-delay: -16s;
+}
+
+html[data-glass][data-theme="dark"] .xg-glass-fluid {
+  mix-blend-mode: normal;
+}
+
+@keyframes xg-glass-drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(6%, 5%) scale(1.08);
+  }
+  66% {
+    transform: translate(-4%, 8%) scale(0.94);
+  }
+  100% {
+    transform: translate(3%, -4%) scale(1.04);
+  }
+}
+
+/* 壁纸层：图片 + 独立模糊 + 霜纱 + 亮度 */
+.xg-glass-wallpaper {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.xg-glass-wallpaper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(var(--glass-wallpaper-blur));
+}
+
+.xg-glass-wallpaper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(
+    in srgb,
+    rgb(255 255 255) calc(34% * var(--glass-wallpaper-frost)),
+    transparent
+  );
+}
+
+html[data-glass][data-theme="dark"] .xg-glass-wallpaper::after {
+  background: color-mix(
+    in srgb,
+    rgb(12 18 27) calc(46% * var(--glass-wallpaper-frost)),
+    transparent
+  );
+}
+
+/* 亮度 veil：一次只有一层有效（JS 控制强度） */
+.xg-glass-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(255, 255, 255, var(--glass-brightness-w)), rgba(255, 255, 255, var(--glass-brightness-w))),
+    linear-gradient(to bottom, rgba(0, 0, 0, var(--glass-brightness-b)), rgba(0, 0, 0, var(--glass-brightness-b)));
+  mix-blend-mode: normal;
+}
+
+/* 粒子 canvas 本体 */
+.xg-glass-particles canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================================
+ * 五、边缘渐隐（上下两条 blur 渐隐条，JS 注入）
+ * ============================================================ */
+.xg-glass-edge {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 13px;
+  z-index: 7;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.xg-glass-edge.top {
+  top: 0;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+}
+
+.xg-glass-edge.bottom {
+  bottom: 0;
+  mask-image: linear-gradient(0deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+  -webkit-mask-image: linear-gradient(0deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+}
+
+html[data-glass][data-theme="dark"] .xg-glass-edge {
+  background: rgba(0, 0, 0, 0.24);
+}
+
+/* ============================================================
+ * 六、精细升级：登录页玻璃化 + 设置浮层玻璃化
+ * ============================================================ */
+
+/* 登录/注册页：玻璃模式去掉自带渐变底，露出全局玻璃背景层 */
+html[data-glass] .login-page,
+html[data-glass] .register-page {
+  background: transparent;
+}
+html[data-glass][data-theme="dark"] .login-page,
+html[data-glass][data-theme="dark"] .register-page {
+  background: transparent;
+}
+
+/* 网格线叠在玻璃上，调淡更有层次 */
+html[data-glass] .bg-grid {
+  opacity: 0.3;
+}
+
+/* 登录卡片玻璃化 */
+html[data-glass] .auth-card {
+  background: var(--glass-surface-strong);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight), 0 20px 60px rgba(19, 45, 83, 0.16);
+}
+
+/* 登录输入框玻璃化 */
+html[data-glass] .auth-form .el-input__wrapper {
+  background: var(--glass-fill);
+  box-shadow: 0 0 0 1px var(--glass-border) inset;
+}
+
+/* 设置浮层（玻璃设置面板）玻璃化 */
+html[data-glass] .xg-glass-pop {
+  background: var(--glass-surface-strong);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 16px 48px rgba(19, 45, 83, 0.2), var(--glass-highlight);
+}
+html[data-glass][data-theme="dark"] .xg-glass-pop {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* 通用弹层/对话框玻璃化（群聊信息、确认框等） */
+html[data-glass] .el-dialog,
+html[data-glass] .el-message-box {
+  background: var(--glass-surface-strong);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  border: 1px solid var(--glass-border);
+}

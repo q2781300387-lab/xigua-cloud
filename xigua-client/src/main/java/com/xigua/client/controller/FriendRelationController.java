@@ -1,20 +1,18 @@
 package com.xigua.client.controller;
 
 import com.xigua.domain.dto.FriendVerifyDTO;
-import com.xigua.domain.dto.sendFriendRequestDTO;
-import com.xigua.domain.result.R;
+import com.xigua.domain.dto.SendFriendRequestDTO;
+import com.xigua.common.core.base.R;
 import com.xigua.domain.vo.FriendDetailVO;
-import com.xigua.domain.vo.FriendVO;
-import com.xigua.domain.vo.FriendRequestVO;
 import com.xigua.api.service.FriendRelationService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @ClassName FriendRelationController
@@ -38,7 +36,7 @@ public class FriendRelationController {
      */
     @Operation(summary = "发送好友请求")
     @PostMapping("/sendFriendRequest")
-    public R<Boolean> sendFriendRequest(@RequestBody sendFriendRequestDTO dto){
+    public R<Boolean> sendFriendRequest(@RequestBody SendFriendRequestDTO dto){
         Boolean sendFriendRequest = friendRelationService.sendFriendRequest(dto);
         if(!sendFriendRequest){
             return R.fail("发送失败");
@@ -70,6 +68,9 @@ public class FriendRelationController {
      * @param friendId
      * @return FriendDetailVO
      */
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "查询成功", content =
+            { @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = FriendDetailVO.class)) })})
     @Operation(summary = "好友详情")
     @GetMapping("/getFriendDetail")
     public R<FriendDetailVO> getFriendDetail(@RequestParam("friendId") String friendId){

@@ -1,6 +1,7 @@
 package com.xigua.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.xigua.common.mybatis.base.PagePlus;
 import com.xigua.domain.entity.GroupMember;
 
 import java.time.LocalDateTime;
@@ -80,4 +81,63 @@ public interface GroupMemberService extends IService<GroupMember> {
      * @return Set<String>
     */
     Set<String> getGroupMembers(String groupId);
+
+    /**
+     * 群成员分页查询
+     * @author wangjinfei
+     * @date 2026/3/10
+     * @param groupId
+     * @param keyword
+     * @param pageNum
+     * @param pageSize
+     * @return PagePlus<GroupMember>
+     */
+    PagePlus<GroupMember> pageByGroupId(String groupId, String keyword, Integer pageNum, Integer pageSize);
+
+    /**
+     * 移除单个群成员（退出群聊时调用）
+     * @author doubao
+     * @date 2026/11/6
+     * @param groupId 群组id
+     * @param userId 用户id
+     * @return Boolean 是否移除成功
+     */
+    Boolean removeGroupMember(String groupId, String userId);
+
+    /**
+     * 修改群成员角色（设/取消管理员）
+     * @author doubao
+     * @date 2026/11/12
+     * @param groupId 群组id
+     * @param userId 目标用户id
+     * @param role 角色（1：群主；2：群管理；3：普通成员）
+     * @return Boolean 是否修改成功
+     */
+    Boolean updateRole(String groupId, String userId, Integer role);
+
+    /**
+     * 更新成员单人禁言截止时间（null 表示解除）
+     * @param groupId 群组id
+     * @param userId 目标用户id
+     * @param muteUntil 截止时间
+     * @return Boolean 是否更新成功
+     */
+    Boolean updateMuteUntil(String groupId, String userId, LocalDateTime muteUntil);
+
+    /**
+     * 查询成员单人禁言截止时间
+     * @param groupId 群组id
+     * @param userId 目标用户id
+     * @return LocalDateTime 截止时间，未禁言返回 null
+     */
+    LocalDateTime getMuteUntil(String groupId, String userId);
+
+    /**
+     * 移除群内全部成员（解散群聊时调用）
+     * @author doubao
+     * @date 2026/11/6
+     * @param groupId 群组id
+     * @return Boolean 是否移除成功
+     */
+    Boolean removeAllGroupMember(String groupId);
 }

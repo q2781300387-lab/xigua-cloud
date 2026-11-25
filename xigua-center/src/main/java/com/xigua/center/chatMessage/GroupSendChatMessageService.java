@@ -6,7 +6,7 @@ import com.xigua.api.service.CenterService;
 import com.xigua.api.service.GroupMemberService;
 import com.xigua.api.service.MessageReadService;
 import com.xigua.common.core.util.DateUtil;
-import com.xigua.common.core.util.RedisUtil;
+import com.xigua.common.redis.client.RedisClient;
 import com.xigua.common.sequence.sequence.Sequence;
 import com.xigua.domain.bo.*;
 import com.xigua.domain.connect.Client;
@@ -40,17 +40,19 @@ public class GroupSendChatMessageService extends AbstractSendChatMessageService 
     @Autowired
     private Sequence sequence;
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
     @Autowired
     private MessageReadService messageReadService;
     @Autowired
     private CenterService centerService;
+    @Autowired
+    private com.xigua.center.service.PushService pushService;
     @DubboReference
     private GroupMemberService groupMemberService;
 
     @Override
     protected ChatType getChatType() {
-        return ChatType.TWO;
+        return ChatType.GROUP;
     }
 
     /**
@@ -100,20 +102,34 @@ public class GroupSendChatMessageService extends AbstractSendChatMessageService 
      */
     @Override
     public void lastMessage(MessageRequest messageRequest) {
+        String senderId = messageRequest.getSenderId();
         String groupId = messageRequest.getReceiverId();
         Set<String> groupMemberIds = groupMemberService.getGroupMembers(messageRequest.getReceiverId());
         if (CollectionUtils.isEmpty(groupMemberIds)){
             return;
         }
 
-        for (String groupMemberId : groupMemberIds) {
-            long timestamp = System.currentTimeMillis();
+        // 统一时间戳
+        long timestamp = System.currentTimeMillis();
 
-            // 存储redis 最后消息
-            redisUtil.zsadd(RedisEnum.LAST_MES.getKey() + groupMemberId, groupId, timestamp);
-            // 存储redis 最后消息内容
-            LastMessageBO lastMessageBO = chatMessageDTO2LastMessageBO(messageRequest);
-            redisUtil.hashPut(RedisEnum.LAST_MES_CONTENT.getKey() + groupMemberId, groupId, JSONObject.toJSONString(lastMessageBO));
+        // 构建最后消息对象
+        LastMessageBO selfMessage = chatMessageDTO2LastMessageBO(messageRequest, true);
+        LastMessageBO otherMessage = chatMessageDTO2LastMessageBO(messageRequest, false);
+
+        // 只序列化一次
+        String selfMessageJson = JSONObject.toJSONString(selfMessage);
+        String otherMessageJson = JSONObject.toJSONString(otherMessage);
+
+        String lastMesKeyPrefix = RedisEnum.LAST_MES.getKey();
+        String lastMesContentKeyPrefix = RedisEnum.LAST_MES_CONTENT.getKey();
+
+        for (String memberId : groupMemberIds) {
+            // zset：存储redis 最后消息
+            redisClient.zsadd(lastMesKeyPrefix + memberId, groupId, timestamp);
+
+            // hash：最后一条消息内容
+            String content = senderId.equals(memberId) ? selfMessageJson : otherMessageJson;
+            redisClient.hashPut(lastMesContentKeyPrefix + memberId, groupId, content);
         }
     }
 
@@ -124,18 +140,18 @@ public class GroupSendChatMessageService extends AbstractSendChatMessageService 
      * @param messageRequest
      * @return LastMessageBO
      */
-    private LastMessageBO chatMessageDTO2LastMessageBO(MessageRequest messageRequest){
+    private LastMessageBO chatMessageDTO2LastMessageBO(MessageRequest messageRequest, boolean isSender){
         LastMessageBO lastMessageBO = new LastMessageBO();
         LastMessageContentBO lastMessageContent = new LastMessageContentBO();
         String senderId = messageRequest.getSenderId();
         String groupId = messageRequest.getReceiverId();
 
         lastMessageBO.setChatId(groupId);
-        lastMessageBO.setChatType(ChatType.TWO.getType());
+        lastMessageBO.setChatType(ChatType.GROUP.getType());
         lastMessageBO.setUpdateTime(System.currentTimeMillis());
 
         // 群组
-        String groupCache = redisUtil.get(RedisEnum.GROUP.getKey() + groupId);
+        String groupCache = redisClient.get(RedisEnum.GROUP.getKey() + groupId);
         if(StringUtils.isNotEmpty(groupCache)){
             Group group = JSONObject.parseObject(groupCache, Group.class);
             lastMessageBO.setChatName(group.getGroupName());
@@ -147,12 +163,18 @@ public class GroupSendChatMessageService extends AbstractSendChatMessageService 
         }
 
         // 封装 最后消息内容
-        String userCache = redisUtil.get(RedisEnum.USER.getKey() + senderId);
-        if(StringUtils.isNotEmpty(userCache)){
-            User user = JSONObject.parseObject(userCache, User.class);
-            lastMessageContent.setContent(user.getUsername() + ": " + messageRequest.getMessage());
+        if(isSender){
+            lastMessageContent.setContent(lastMessageSummary(messageRequest));
+            lastMessageBO.setLastMessageContent(lastMessageContent);
+        }else{
+            // 非发送人，从redis获取用户名
+            String userCache = redisClient.get(RedisEnum.USER.getKey() + senderId);
+            if(StringUtils.isNotEmpty(userCache)){
+                User user = JSONObject.parseObject(userCache, User.class);
+                lastMessageContent.setContent(user.getUsername() + ": " + lastMessageSummary(messageRequest));
+            }
+            lastMessageBO.setLastMessageContent(lastMessageContent);
         }
-        lastMessageBO.setLastMessageContent(lastMessageContent);
 
         return lastMessageBO;
     }
@@ -170,6 +192,16 @@ public class GroupSendChatMessageService extends AbstractSendChatMessageService 
             return;
         }
 
+        // 群名只取一次，离线推送标题复用，避免每个成员都查 Redis
+        String groupName = "群聊新消息";
+        String groupCache = redisClient.get(RedisEnum.GROUP.getKey() + messageRequest.getReceiverId());
+        if (StringUtils.isNotEmpty(groupCache)) {
+            Group group = JSONObject.parseObject(groupCache, Group.class);
+            if (group != null && StringUtils.isNotEmpty(group.getGroupName())) {
+                groupName = group.getGroupName();
+            }
+        }
+
         for (String groupMemberId : groupMemberIds) {
             // 群聊 不用给自己推消息
             if(groupMemberId.equals(messageRequest.getSenderId())){
@@ -183,16 +215,12 @@ public class GroupSendChatMessageService extends AbstractSendChatMessageService 
             */
 
             // 获取接收人所在的节点信息
-            String receiverInServer = centerService.onlineUser(groupMemberId);
-            if(StringUtils.isEmpty(receiverInServer)){
-                // 如果接收人不在线，直接返回，不做后续处理
+            Client client = centerService.onlineUser(groupMemberId);
+            if(client == null){
+                // 离线成员走 Web Push 兜底，群消息关闭页面也能收到系统通知
+                pushService.pushGroupChatMessage(messageRequest, groupMemberId, groupName);
                 continue;
             }
-            // 获取接收者所在的节点信息
-            String key = RedisEnum.CLIENT_CONNECT_CENTER.getKey() +
-                    receiverInServer.split(":")[1] + ":" + receiverInServer.split(":")[2];
-            String value = redisUtil.get(key);
-            Client client = JSONObject.parseObject(value, Client.class);
 
             // 此时的接收人是群组成员
             MessageResponse messageResponse = new MessageResponse();
@@ -201,8 +229,8 @@ public class GroupSendChatMessageService extends AbstractSendChatMessageService 
             messageResponse.setSender(getRealSender(messageRequest.getSenderId()));
             messageResponse.setReceiverId(groupMemberId);
             messageResponse.setSubType(MessageSubType.MES_RECEIVE.getType());
-            // 实时推送消息，发送到接收人所在节点
-            centerService.sendMessage2Client(messageResponse, client);
+            // 实时推送消息，发送到接收人所有在线节点
+            centerService.sendMessage2User(messageResponse, groupMemberId);
         }
     }
 
@@ -217,7 +245,7 @@ public class GroupSendChatMessageService extends AbstractSendChatMessageService 
         SenderBO senderBO = new SenderBO();
 
         // 获取真正发送人缓存
-        String userCache = redisUtil.get(RedisEnum.USER.getKey() + realSenderId);
+        String userCache = redisClient.get(RedisEnum.USER.getKey() + realSenderId);
         if(StringUtils.isNotEmpty(userCache)){
             User user = JSONObject.parseObject(userCache, User.class);
             senderBO.setUsername(user.getUsername());
@@ -247,18 +275,18 @@ public class GroupSendChatMessageService extends AbstractSendChatMessageService 
             if(groupMemberId.equals(senderId)){
                 continue;
             }
-            String receiverInServer = centerService.onlineUser(groupMemberId);
+            Client client = centerService.onlineUser(groupMemberId);
 
             // 获取接收人打开的聊天窗口好友是谁
-            String receiverActiveFriend = redisUtil.get(RedisEnum.CURRENT_CHAT_WINDOW.getKey() + groupMemberId);
+            String receiverActiveFriend = redisClient.get(RedisEnum.CURRENT_CHAT_WINDOW.getKey() + groupMemberId);
 
             // 存储redis 好友未读数量
             String groupUnreadCountKey = RedisEnum.GROUP_UNREAD_COUNT.getKey() + groupMemberId;
 
             // 接收人在线 && 打开聊天框是发送人
-            if(StringUtils.isNotEmpty(receiverInServer) && groupId.equals(receiverActiveFriend)){
+            if(client != null && groupId.equals(receiverActiveFriend)){
                 // 未读消息清零
-                redisUtil.hashPut(groupUnreadCountKey, groupId, 0);
+                redisClient.hashPut(groupUnreadCountKey, groupId, 0);
             }else{
                 /**
                  * 如果使用hash先获取，再put +1，时间复杂度是O(1) + O(1)
@@ -267,7 +295,11 @@ public class GroupSendChatMessageService extends AbstractSendChatMessageService 
                  */
 
                 // 使用redis中的hincrby命令  未读消息 + 1
-                redisUtil.hincrby(groupUnreadCountKey, groupId, 1);
+                redisClient.hincrby(groupUnreadCountKey, groupId, 1);
+
+                // 给群成员增加总未读数
+                String chatUnreadCountKey = RedisEnum.CHAT_UNREAD_COUNT.getKey() + groupMemberId;
+                redisClient.incrby(chatUnreadCountKey, 1);
             }
         }
     }
@@ -294,13 +326,13 @@ public class GroupSendChatMessageService extends AbstractSendChatMessageService 
             }
 
             // 获取接收人所在的节点信息
-            String receiverInServer = centerService.onlineUser(groupMemberId);
-            if(StringUtils.isEmpty(receiverInServer)){
+            Client receiverClient = centerService.onlineUser(groupMemberId);
+            if(receiverClient == null){
                 continue;
             }
 
             // 获取接收人打开的聊天窗口好友是谁
-            String receiverActiveFriend = redisUtil.get(RedisEnum.CURRENT_CHAT_WINDOW.getKey() + groupMemberId);
+            String receiverActiveFriend = redisClient.get(RedisEnum.CURRENT_CHAT_WINDOW.getKey() + groupMemberId);
             if (StringUtils.isEmpty(receiverActiveFriend)) {
                 continue;
             }
@@ -310,15 +342,10 @@ public class GroupSendChatMessageService extends AbstractSendChatMessageService 
             }
 
             // 接收人打开的聊天窗口好友是发送人，发送已读通知  （对方在线 && 对方打开的聊天框是发送人）
-            // 获取发送人所在的节点信息
-            String userInServer = centerService.onlineUser(senderId);
-            if (StringUtils.isEmpty(userInServer)) {
+            // 获取发送人是否在线
+            if (!centerService.isOnline(senderId)) {
                 continue;
             }
-            String key = RedisEnum.CLIENT_CONNECT_CENTER.getKey() +
-                    userInServer.split(":")[1] + ":" + userInServer.split(":")[2];
-            String value = redisUtil.get(key);
-            Client client = JSONObject.parseObject(value, Client.class);
 
             // 系统推送已读通知
             MessageResponse messageResponse = new MessageResponse();
@@ -331,7 +358,7 @@ public class GroupSendChatMessageService extends AbstractSendChatMessageService 
 
             messageResponse.setMessage(json);
             messageResponse.setCreateTime(DateUtil.formatDateTime(LocalDateTime.now(), DateUtil.DATE_TIME_FORMATTER));
-            centerService.sendMessage2Client(messageResponse, client);
+            centerService.sendMessage2User(messageResponse, senderId);
 
             // 标记为已读
             messageReadService.markRead(messageRequest.getChatMessageId(), groupMemberId);

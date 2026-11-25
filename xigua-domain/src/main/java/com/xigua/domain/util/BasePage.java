@@ -1,7 +1,7 @@
 package com.xigua.domain.util;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.xigua.domain.result.BasePageVO;
+import com.xigua.common.mybatis.base.BasePageVO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class BasePage<R> {
      * @param list
      * @return BasePageVO<R>
     */
-    public static <R> BasePageVO<R> getResult(Page<R> page, List<R> list){
+    public static <R> BasePageVO<R> getResult(Page<?> page, List<R> list){
         BasePageVO<R> result = new BasePageVO<>();
         result.setPageNum((int) page.getCurrent());
         result.setPageSize((int) page.getSize());

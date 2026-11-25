@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="西瓜IM">
+  <defs>
+    <linearGradient id="bg" x1="72" y1="32" x2="452" y2="488" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#58B2FF" />
+      <stop offset="0.55" stop-color="#1685FF" />
+      <stop offset="1" stop-color="#0064E6" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="url(#bg)" />
+  <circle cx="256" cy="268" r="160" fill="#FFFFFF" />
+  <ellipse cx="160" cy="332" rx="8" ry="13" transform="rotate(-14 160 332)" fill="#1D1D1F" />
+  <ellipse cx="208" cy="342" rx="9" ry="14" transform="rotate(-8 208 342)" fill="#1D1D1F" />
+  <ellipse cx="256" cy="346" rx="10" ry="15" fill="#1D1D1F" />
+  <ellipse cx="304" cy="342" rx="9" ry="14" transform="rotate(8 304 342)" fill="#1D1D1F" />
+  <ellipse cx="352" cy="332" rx="8" ry="13" transform="rotate(14 352 332)" fill="#1D1D1F" />
+  <path d="M158 384 Q256 430 354 384" fill="none" stroke="#34C759" stroke-width="22" stroke-linecap="round" />
+</svg>

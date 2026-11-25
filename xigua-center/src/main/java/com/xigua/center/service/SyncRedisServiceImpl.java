@@ -3,7 +3,7 @@ package com.xigua.center.service;
 import com.alibaba.fastjson2.JSONObject;
 import com.xigua.api.service.*;
 import com.xigua.common.core.util.DateUtil;
-import com.xigua.common.core.util.RedisUtil;
+import com.xigua.common.redis.client.RedisClient;
 import com.xigua.domain.bo.LastMessageContentBO;
 import com.xigua.domain.entity.ChatMessage;
 import com.xigua.domain.entity.Group;
@@ -33,7 +33,7 @@ import java.util.List;
 @DubboService
 public class SyncRedisServiceImpl implements SyncRedisService {
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
     @Autowired
     private ChatMessageService chatMessageService;
     @DubboReference
@@ -149,7 +149,7 @@ public class SyncRedisServiceImpl implements SyncRedisService {
                 // 映射vo
                 LastMessageVO lastMessageVO = new LastMessageVO();
                 lastMessageVO.setChatId(friendId);
-                lastMessageVO.setChatType(ChatType.ONE.getType());
+                lastMessageVO.setChatType(ChatType.PRIVATE.getType());
                 lastMessageVO.setChatName(friend.getUsername());
                 lastMessageVO.setAvatar(friend.getAvatar());
                 LastMessageContentBO lastMessageContentBO = new LastMessageContentBO();
@@ -158,9 +158,9 @@ public class SyncRedisServiceImpl implements SyncRedisService {
                 lastMessageVO.setUpdateTime(DateUtil.toEpochMilli(lastMessage.getCreateTime()));
 
                 // 同步redis 最后消息
-                redisUtil.zsadd(RedisEnum.LAST_MES.getKey() + userId, friendId, DateUtil.toEpochMilli(lastMessage.getCreateTime()));
+                redisClient.zsadd(RedisEnum.LAST_MES.getKey() + userId, friendId, DateUtil.toEpochMilli(lastMessage.getCreateTime()));
                 // 同步redis 最后消息内容
-                redisUtil.hashPut(RedisEnum.LAST_MES_CONTENT.getKey() + userId, friendId, JSONObject.toJSONString(lastMessageVO));
+                redisClient.hashPut(RedisEnum.LAST_MES_CONTENT.getKey() + userId, friendId, JSONObject.toJSONString(lastMessageVO));
             }
         }
 
@@ -205,7 +205,7 @@ public class SyncRedisServiceImpl implements SyncRedisService {
                 // 映射vo
                 LastMessageVO lastMessageVO = new LastMessageVO();
                 lastMessageVO.setChatId(groupId);
-                lastMessageVO.setChatType(ChatType.TWO.getType());
+                lastMessageVO.setChatType(ChatType.GROUP.getType());
                 lastMessageVO.setChatName(group.getGroupName());
                 lastMessageVO.setAvatar(group.getGroupAvatar());
                 LastMessageContentBO lastMessageContentBO = new LastMessageContentBO();
@@ -214,9 +214,9 @@ public class SyncRedisServiceImpl implements SyncRedisService {
                 lastMessageVO.setUpdateTime(DateUtil.toEpochMilli(groupMember.getCreateTime()));
 
                 // 同步redis 最后消息
-                redisUtil.zsadd(RedisEnum.LAST_MES.getKey() + userId, groupId, DateUtil.toEpochMilli(groupMember.getCreateTime()));
+                redisClient.zsadd(RedisEnum.LAST_MES.getKey() + userId, groupId, DateUtil.toEpochMilli(groupMember.getCreateTime()));
                 // 同步redis 最后消息内容
-                redisUtil.hashPut(RedisEnum.LAST_MES_CONTENT.getKey() + userId, groupId, JSONObject.toJSONString(lastMessageVO));
+                redisClient.hashPut(RedisEnum.LAST_MES_CONTENT.getKey() + userId, groupId, JSONObject.toJSONString(lastMessageVO));
             }
         }
 

@@ -6,8 +6,11 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public enum RedisEnum {
-    CLIENT_CONNECT_CENTER("client_connect_center:", "客户端长连接映射信息"),
+    CAPTCHA("captcha:", "管理端验证码"),
+    TOKEN("token:", "用户token"),
+    CLIENT_NODE_SYSTEM("client_node_system:", "client节点系统信息"),
     ONLINE_USER("online_user:", "在线用户"),
+    ONLINE_NODE_USER("online_node_user:", "在线节点用户"),
     EMAIL_CODE("email_code:", "邮箱验证码"),
     LOCATION_IP("location_ip:", "ip位置信息"),
     WEATHER_CITY("weather_city:", "城市天气信息"),
@@ -18,12 +21,15 @@ public enum RedisEnum {
     CURRENT_CHAT_WINDOW("current_chat_window:", "当前聊天窗口"),
     FRIEND_UNREAD_COUNT("friend_unread_count:", "好友未读数量"),
     GROUP_UNREAD_COUNT("group_unread_count:", "群聊未读数量"),
+    CHAT_UNREAD_COUNT("chat_unread_count:", "聊天未读总数量"),
     TICKET("ticket:", "一次性ticket"),
     LAST_PING_TIME("last_ping_time:", "最后心跳时间"),
     GROUP("group:", "群聊信息"),
     GROUP_MEMBER("group_member:", "群成员"),
     GROUP_MEMBER_ID("group_member_id:", "群成员id"),
     BOT("bot:", "机器人"),
+    AI_SESSION("ai_session:", "ai会话"),
+    RESET_PASSWORD_TOKEN("reset_password_token:", "重置密码临时token")
     ;
 
     final String key;

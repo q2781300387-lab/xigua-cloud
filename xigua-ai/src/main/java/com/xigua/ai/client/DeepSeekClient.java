@@ -9,6 +9,7 @@ import okhttp3.*;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSourceListener;
 import okhttp3.sse.EventSources;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 
@@ -20,9 +21,11 @@ import java.io.IOException;
  */
 @Slf4j
 public class DeepSeekClient {
-    private static final String BASE_URL = "https://api.deepseek.com";
+    /** 默认 DeepSeek 官方地址，可通过配置 llm.deepseek.base-url 覆盖（OpenAI 兼容） */
+    private static final String DEFAULT_BASE_URL = "https://api.deepseek.com";
     private static final String CHAT_COMPLETIONS = "/chat/completions";
 
+    private String baseUrl = DEFAULT_BASE_URL;
     private String apiKey;
     private String model;
 
@@ -36,7 +39,7 @@ public class DeepSeekClient {
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = RequestBody.create(mediaType, JSONObject.toJSONString(requestBody));
         Request request = new Request.Builder()
-                .url(BASE_URL + CHAT_COMPLETIONS)
+                .url(baseUrl + CHAT_COMPLETIONS)
                 .method("POST", body)
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Accept", "application/json")
@@ -71,7 +74,7 @@ public class DeepSeekClient {
         );
 
         Request request = new Request.Builder()
-                .url(BASE_URL + CHAT_COMPLETIONS)
+                .url(baseUrl + CHAT_COMPLETIONS)
                 .post(body)
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Accept", "text/event-stream")
@@ -153,8 +156,14 @@ public class DeepSeekClient {
     }
 
     public static final class Builder{
+        private String baseUrl;
         private String apiKey;
         private String model;
+
+        public Builder baseUrl(String baseUrl) {
+            this.baseUrl = baseUrl;
+            return this;
+        }
 
         public Builder apiKey(String apiKey) {
             this.apiKey = apiKey;
@@ -168,6 +177,11 @@ public class DeepSeekClient {
 
         public DeepSeekClient build(){
             DeepSeekClient deepSeekClient = new DeepSeekClient();
+            if (StringUtils.isNotBlank(this.baseUrl)) {
+                deepSeekClient.baseUrl = this.baseUrl.endsWith("/")
+                        ? this.baseUrl.substring(0, this.baseUrl.length() - 1)
+                        : this.baseUrl;
+            }
             deepSeekClient.apiKey = this.apiKey;
             deepSeekClient.model = this.model;
             return deepSeekClient;

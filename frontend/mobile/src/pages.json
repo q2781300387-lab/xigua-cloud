@@ -1,0 +1,249 @@
+{
+	"pages": [
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/chat/chat-detail",
+			"style": {
+				"navigationBarTitleText": "聊天详情",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/chat/search",
+			"style": {
+				"navigationBarTitleText": "搜索",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/call/video-call",
+			"style": {
+				"navigationBarTitleText": "视频通话",
+				"navigationStyle": "custom",
+				"backgroundColor": "#0b0b0f",
+				"backgroundTextStyle": "light",
+				"app-plus": {
+					"background": "#0b0b0f"
+				}
+			}
+		},
+		{
+			"path": "pages/call/call-records",
+			"style": {
+				"navigationBarTitleText": "通话记录",
+				"navigationStyle": "custom",
+				"backgroundColor": "#f2f2f7"
+			}
+		},
+		{
+			"path": "pages/chat/chat-list",
+			"style": {
+				"navigationBarTitleText": "聊天",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/register/register",
+			"style": {
+				"navigationBarTitleText": "注册",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "西瓜 IM",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/contacts/contact-list",
+			"style": {
+				"navigationBarTitleText": "通讯录",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/contacts/add-friend",
+			"style": {
+				"navigationBarTitleText": "添加好友",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/contacts/create-group",
+			"style": {
+				"navigationBarTitleText": "发起群聊",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/contacts/friend-detail",
+			"style": {
+				"navigationBarTitleText": "好友详情",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/contacts/group-detail",
+			"style": {
+				"navigationBarTitleText": "群详情",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/contacts/group-join",
+			"style": {
+				"navigationBarTitleText": "加入群聊",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/chat/group-call",
+			"style": {
+				"navigationBarTitleText": "群通话",
+				"navigationStyle": "custom",
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/notice/notice-list",
+			"style": {
+				"navigationBarTitleText": "通知",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/discover/discover",
+			"style": {
+				"navigationBarTitleText": "发现",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/moments/moments",
+			"style": {
+				"navigationBarTitleText": "朋友圈",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/moments/moment-detail",
+			"style": {
+				"navigationBarTitleText": "动态详情",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/treehole/treehole",
+			"style": {
+				"navigationBarTitleText": "匿名树洞",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/bots/bots",
+			"style": {
+				"navigationBarTitleText": "机器人",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/bots/bot-chat",
+			"style": {
+				"navigationBarTitleText": "AI 对话",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/todo/todo",
+			"style": {
+				"navigationBarTitleText": "待办事项",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/profile/profile",
+			"style": {
+				"navigationBarTitleText": "个人中心",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/profile/favorites",
+			"style": {
+				"navigationBarTitleText": "收藏夹",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/settings/settings",
+			"style": {
+				"navigationBarTitleText": "设置",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/settings/privacy",
+			"style": {
+				"navigationBarTitleText": "隐私与安全",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/profile/edit-profile",
+			"style": {
+				"navigationBarTitleText": "编辑资料",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/profile/change-email",
+			"style": {
+				"navigationBarTitleText": "更换邮箱",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/auth/forgot-password",
+			"style": {
+				"navigationBarTitleText": "找回密码",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/auth/reset-password",
+			"style": {
+				"navigationBarTitleText": "设置新密码",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/friends/new-friends",
+			"style": {
+				"navigationBarTitleText": "新的朋友",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/friends/group-notifications",
+			"style": {
+				"navigationBarTitleText": "群通知",
+				"navigationStyle": "custom"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "IM Messenger",
+		"navigationBarBackgroundColor": "#ffffff",
+		"backgroundColor": "#f2f2f7"
+	},
+	"uniIdRouter": {}
+}

@@ -22,6 +22,9 @@
         <module>xigua-common-mybatis</module>
         <module>xigua-common-dubbo</module>
         <module>xigua-common-mq</module>
+        <module>xigua-common-redis</module>
+        <module>xigua-common-docker</module>
+        <module>xigua-common-es</module>
     </modules>
 
 </project>

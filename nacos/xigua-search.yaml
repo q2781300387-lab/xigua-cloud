@@ -1,0 +1,72 @@
+# Elasticsearch（xigua-common-es）
+xigua:
+  es:
+    enabled: true
+    uris:
+      - http://127.0.0.1:9200
+    connect-timeout: 5000
+    socket-timeout: 60000
+
+dubbo:
+  application:
+    logger: slf4j
+    # 元数据中心 local 本地 remote 远程 这里使用远程便于其他服务获取
+    metadataType: remote
+    # 可选值 interface、instance、all，默认是 all，即接口级地址、应用级地址都注册
+    register-mode: instance
+    service-discovery:
+      # FORCE_INTERFACE，只消费接口级地址，如无地址则报错，单订阅 2.x 地址
+      # APPLICATION_FIRST，智能决策接口级/应用级地址，双订阅
+      # FORCE_APPLICATION，只消费应用级地址，如无地址则报错，单订阅 3.x 地址
+      migration: FORCE_APPLICATION
+  scan:
+    base-packages: com.xigua
+  protocol:
+    name: dubbo
+    port: 20887
+  registry:
+    check: false
+    # 注册中心nacos
+    address: nacos://127.0.0.1:8848
+    # 指定nacos namespace命名空间
+    parameters:
+      namespace: xigua-dubbo
+  consumer:
+    check: false
+    # 重试为0
+    retries: 0
+    # 超时5秒
+    timeout: 5000
+    # 自定义过滤器（用来隐式传当前用户信息，传递链路id，异常处理，去除默认处理）
+    filter: userContextFilter, traceIdFilter, dubboExceptionFilter, -exception
+  provider:
+    check: false
+    # 重试为0
+    retries: 0
+    # 超时5秒
+    timeout: 5000
+    # 自定义过滤器（用来隐式传当前用户信息，传递链路id，异常处理，去除默认处理）
+    filter: userContextFilter, traceIdFilter, dubboExceptionFilter, -exception
+
+logging:
+  level:
+    # 打印 es 请求日志
+    com.xigua.search: debug
+
+# swagger配置
+springdoc:
+  api-docs:
+    path: /search/v3/api-docs
+  swagger-ui:
+    path: /search/swagger-ui.html
+
+# Redis
+spring:
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: CHANGE_ME
+      timeout: 5s
+      connect-timeout: 5s
+

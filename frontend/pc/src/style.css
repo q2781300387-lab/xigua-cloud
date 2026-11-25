@@ -1,0 +1,232 @@
+/* ============ 全局基础 · 苹果设计语言（浅色/深色双主题） ============ */
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'PingFang SC',
+    'Helvetica Neue', 'Microsoft YaHei', Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light;
+  color: rgba(0, 0, 0, 0.88);
+  background-color: #f2f2f7;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* —— iOS 设计令牌 · 浅色 —— */
+  --bg: #f2f2f7;
+  --bg-blur: rgba(249, 249, 252, 0.82);
+  --bg-blur-strong: rgba(255, 255, 255, 0.88);
+  --card: #ffffff;
+  --card-highlight: #f8f8fa;
+  --fill: rgba(120, 120, 128, 0.12);
+  --fill-strong: rgba(120, 120, 128, 0.24);
+  --label: rgba(0, 0, 0, 0.9);
+  --label-secondary: rgba(0, 0, 0, 0.6);
+  --label-tertiary: rgba(0, 0, 0, 0.35);
+  --separator: rgba(60, 60, 67, 0.08);
+  --separator-strong: rgba(60, 60, 67, 0.16);
+  --accent: #007aff;
+  --accent-light: #3395ff;
+  --accent-green: #34c759;
+  --accent-red: #ff3b30;
+  --accent-orange: #ff9500;
+  --accent-purple: #af52de;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 122, 255, 0.05);
+  --scrollbar-thumb: rgba(120, 120, 128, 0.28);
+  --overlay: rgba(0, 0, 0, 0.5);
+  --bg-gradient: linear-gradient(165deg, #f5f7ff 0%, #f2f2f7 55%, #eef6ff 100%);
+  --accent-gradient: linear-gradient(145deg, #e8f1ff, #d4e4ff);
+  --card-gradient: radial-gradient(circle at 35% 30%, #ffffff, #f5f5f7 78%);
+  --bubble-outgoing: #007aff;
+}
+
+/* 跟随系统深色（未手动指定时） */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    color: rgba(255, 255, 255, 0.92);
+    background-color: #000000;
+
+    --bg: #000000;
+    --bg-blur: rgba(28, 28, 30, 0.82);
+    --bg-blur-strong: rgba(28, 28, 30, 0.88);
+    --card: #1c1c1e;
+    --card-highlight: #2c2c2e;
+    --fill: rgba(120, 120, 128, 0.24);
+    --fill-strong: rgba(120, 120, 128, 0.36);
+    --label: rgba(255, 255, 255, 0.92);
+    --label-secondary: rgba(235, 235, 245, 0.6);
+    --label-tertiary: rgba(235, 235, 245, 0.3);
+    --separator: rgba(84, 84, 88, 0.6);
+    --separator-strong: rgba(84, 84, 88, 0.85);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.65), 0 4px 16px rgba(0, 0, 0, 0.4);
+    --scrollbar-thumb: rgba(120, 120, 128, 0.5);
+    --overlay: rgba(0, 0, 0, 0.65);
+    --bg-gradient: linear-gradient(165deg, #1c1c1e 0%, #161618 55%, #1a1d24 100%);
+    --accent-gradient: linear-gradient(145deg, #1c2b3f, #233454);
+    --card-gradient: radial-gradient(circle at 35% 30%, #2c2c2e, #1c1c1e 78%);
+    --bubble-outgoing: #0a84ff;
+  }
+}
+
+/* 手动深色 */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.92);
+  background-color: #000000;
+
+  --bg: #000000;
+  --bg-blur: rgba(28, 28, 30, 0.82);
+  --bg-blur-strong: rgba(28, 28, 30, 0.88);
+  --card: #1c1c1e;
+  --card-highlight: #2c2c2e;
+  --fill: rgba(120, 120, 128, 0.24);
+  --fill-strong: rgba(120, 120, 128, 0.36);
+  --label: rgba(255, 255, 255, 0.92);
+  --label-secondary: rgba(235, 235, 245, 0.6);
+  --label-tertiary: rgba(235, 235, 245, 0.3);
+  --separator: rgba(84, 84, 88, 0.6);
+  --separator-strong: rgba(84, 84, 88, 0.85);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.65), 0 4px 16px rgba(0, 0, 0, 0.4);
+  --scrollbar-thumb: rgba(120, 120, 128, 0.5);
+  --overlay: rgba(0, 0, 0, 0.65);
+  --bg-gradient: linear-gradient(165deg, #1c1c1e 0%, #161618 55%, #1a1d24 100%);
+  --accent-gradient: linear-gradient(145deg, #1c2b3f, #233454);
+  --card-gradient: radial-gradient(circle at 35% 30%, #2c2c2e, #1c1c1e 78%);
+  --bubble-outgoing: #0a84ff;
+}
+
+a {
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: inherit;
+}
+a:hover {
+  color: var(--accent-light);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--label);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+#app {
+  margin: 0 auto;
+  width: 100%;
+  text-align: left;
+}
+
+/* iOS 细滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--fill-strong);
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 主题切换过渡：柔和交叉淡化 */
+body,
+.home-page,
+.login-page,
+.register-page,
+.sidebar,
+.main-content {
+  transition: background-color 0.35s cubic-bezier(0.32, 0.72, 0, 1), color 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* 深色模式下侧栏黑色 PNG 图标反白 */
+:root[data-theme="dark"] .menu-item img {
+  filter: brightness(0) invert(1) opacity(0.6);
+}
+
+:root[data-theme="dark"] .menu-item.active img {
+  filter: brightness(0) invert(1) opacity(0.9);
+}
+
+:root[data-theme="dark"] .project-icon {
+  filter: brightness(0) invert(1) opacity(0.7);
+}
+
+/* 深色模式下首页时段光晕（更明显的氛围光） */
+:root[data-theme="dark"] .home-page.phase-midnight { --glow-1: rgba(175, 82, 222, 0.22); --glow-2: rgba(0, 122, 255, 0.14); }
+:root[data-theme="dark"] .home-page.phase-dawn     { --glow-1: rgba(255, 149, 0, 0.20); --glow-2: rgba(94, 92, 230, 0.18); }
+:root[data-theme="dark"] .home-page.phase-morning  { --glow-1: rgba(0, 122, 255, 0.22); --glow-2: rgba(52, 199, 89, 0.12); }
+:root[data-theme="dark"] .home-page.phase-noon     { --glow-1: rgba(255, 204, 0, 0.16); --glow-2: rgba(0, 122, 255, 0.20); }
+:root[data-theme="dark"] .home-page.phase-afternoon{ --glow-1: rgba(255, 149, 0, 0.16); --glow-2: rgba(0, 122, 255, 0.20); }
+:root[data-theme="dark"] .home-page.phase-dusk     { --glow-1: rgba(255, 94, 58, 0.26); --glow-2: rgba(255, 149, 0, 0.18); }
+:root[data-theme="dark"] .home-page.phase-night    { --glow-1: rgba(88, 86, 214, 0.24); --glow-2: rgba(0, 122, 255, 0.16); }
+
+/* —— 西瓜雨彩蛋（长按侧栏头像触发） —— */
+.watermelon-rain {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.watermelon-rain span {
+  position: absolute;
+  top: -10vh;
+  will-change: transform, opacity;
+  animation: watermelonFall 2.8s cubic-bezier(0.3, 0.4, 0.5, 1) forwards;
+}
+
+@keyframes watermelonFall {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(0.9);
+    opacity: 0;
+  }
+  6% {
+    opacity: 0.95;
+  }
+  82% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateY(118vh) rotate(340deg) scale(1.2);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .watermelon-rain span {
+    animation: none;
+  }
+}
+
+/* ===== Element Plus 弹窗：入场只做位移，opacity 恒为 1 =====
+   el-dialog 会 teleport 到 body，组件内 scoped 样式覆盖不到，只能写在全局。
+   !important 用于压过 dialog-fade-in 关键帧里的 opacity，动画冻结时弹窗内容不会消失。 */
+.el-overlay-dialog {
+  opacity: 1 !important;
+}

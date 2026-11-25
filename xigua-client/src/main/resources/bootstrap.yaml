@@ -18,6 +18,9 @@ spring:
       password: @nacos.password@
       discovery:
         namespace: xigua
+        # 显式指定注册 IP，避免虚拟网卡只拿到链路本地地址(169.254.x.x)时，
+        # 网关/Dubbo 侧按该地址回连导致 WebSocket 下行不可达
+        ip: ${NACOS_DISCOVERY_IP:127.0.0.1}
       config:
         namespace: xigua
         # 配置文件格式

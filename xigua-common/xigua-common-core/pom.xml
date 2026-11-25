@@ -54,17 +54,6 @@
 			<version>${ttl.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-redis</artifactId>
-		</dependency>
-
-		<!-- redis 连接池  -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-pool2</artifactId>
-		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -78,6 +67,93 @@
 			<artifactId>commons-beanutils</artifactId>
 			<version>${beanutils.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>${openapi.version}</version>
+		</dependency>
+
+		<!-- Source: https://mvnrepository.com/artifact/org.lionsoul/ip2region -->
+		<dependency>
+			<groupId>org.lionsoul</groupId>
+			<artifactId>ip2region</artifactId>
+			<version>${ip2region.version}</version>
+		</dependency>
+
+		<!-- OSHI 系统信息库 -->
+		<dependency>
+			<groupId>com.github.oshi</groupId>
+			<artifactId>oshi-core</artifactId>
+			<version>${oshi.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>${okhttp.version}</version>
+		</dependency>
+
+		<!-- Source: https://mvnrepository.com/artifact/nl.basjes.parse.useragent/yauaa -->
+		<dependency>
+			<groupId>nl.basjes.parse.useragent</groupId>
+			<artifactId>yauaa</artifactId>
+			<version>${yauaa.version}</version>
+		</dependency>
+
+		<!-- Source: https://mvnrepository.com/artifact/sheltekio.javalibs/icmp4j -->
+		<dependency>
+			<groupId>sheltekio.javalibs</groupId>
+			<artifactId>icmp4j</artifactId>
+			<version>${icmp4j.version}</version>
+		</dependency>
+
+		<!-- Source: https://mvnrepository.com/artifact/com.github.promeg/tinypinyin -->
+		<dependency>
+			<groupId>com.github.promeg</groupId>
+			<artifactId>tinypinyin</artifactId>
+			<version>${tinypinyin.version}</version>
+		</dependency>
+
+		<!-- BCrypt 密码哈希（仅需要 crypto 模块，不引入 Spring Security 过滤器链） -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-crypto</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>

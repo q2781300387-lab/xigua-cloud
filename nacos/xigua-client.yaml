@@ -11,7 +11,7 @@ spring:
     # 开始ssl 使用smtps而不是smtp
     protocol: smtps
     username: xxx@qq.com
-    password: xxxxxx
+    password: CHANGE_ME
     properties:
       mail:
         smtp:
@@ -27,7 +27,7 @@ spring:
       # 端口
       port: 6379
       # 密码
-      password: 123456
+      password: CHANGE_ME
       # 读超时
       timeout: 5s
       # 连接超时
@@ -48,7 +48,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/xigua?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&useSSL=false
     username: root
-    password: 123456
+    password: CHANGE_ME
 
   kafka:
     # kafka集群信息，多个用逗号间隔
@@ -142,8 +142,8 @@ springdoc:
 minio:
   endpoint: http://localhost:9000
   proxy: http://localhost:9000
-  access-key: minioadmin
-  secret-key: minioadmin
+  access-key: CHANGE_ME
+  secret-key: CHANGE_ME
   bucket-name: xigua
 
 # 三方接口配置(天地聚合平台)

@@ -10,6 +10,8 @@ public enum MessageType {
     NOTIFY("notify","通知消息"),
     UNREAD("unread", "未读消息"),
     HEART_BEAT("heart_beat", "心跳"),
+    AUDIO_CALL("audio_call", "语音通话"),
+    VIDEO_CALL("video_call", "视频通话"),
     ;
 
     final String type;

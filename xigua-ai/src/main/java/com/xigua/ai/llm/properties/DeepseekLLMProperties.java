@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "llm.deepseek")
 public class DeepseekLLMProperties {
+    /** API 基础地址（OpenAI 兼容），默认 DeepSeek 官方 */
+    private String baseUrl = "https://api.deepseek.com";
     private String apiKey;
     private String model;
 }

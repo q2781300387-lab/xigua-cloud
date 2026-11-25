@@ -3,12 +3,11 @@ package com.xigua.client.service;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.xigua.client.properties.ThirdPartyProperties;
-import com.xigua.common.core.util.RedisUtil;
+import com.xigua.common.redis.client.RedisClient;
 import com.xigua.domain.enums.RedisEnum;
 import com.xigua.domain.thirdparty.GetLocationRes;
 import com.xigua.domain.thirdparty.GetWeatherRes;
 import com.xigua.api.service.ThirdPartyService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -34,7 +33,7 @@ public class ThirdPartyServiceImpl implements ThirdPartyService {
     private final OkHttpClient client = new OkHttpClient();
 
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
     @Autowired
     private ThirdPartyProperties thirdPartyProperties;
 
@@ -50,7 +49,7 @@ public class ThirdPartyServiceImpl implements ThirdPartyService {
         GetLocationRes getLocationRes = new GetLocationRes();
 
         // 从缓存中获取结果
-        String cachedResult = redisUtil.get(RedisEnum.LOCATION_IP.getKey() + ip);
+        String cachedResult = redisClient.get(RedisEnum.LOCATION_IP.getKey() + ip);
         if (cachedResult != null) {
             return JSONObject.parseObject(cachedResult, GetLocationRes.class);
         }
@@ -92,7 +91,7 @@ public class ThirdPartyServiceImpl implements ThirdPartyService {
             getLocationRes = JSONObject.parseObject(result, GetLocationRes.class);
 
             // 6. 缓存结果
-            redisUtil.set(RedisEnum.LOCATION_IP.getKey() + ip, result, 60 * 60 * 24L);
+            redisClient.set(RedisEnum.LOCATION_IP.getKey() + ip, result, 60 * 60 * 24L);
             return getLocationRes;
         }catch (Exception e) {
             log.error("获取地址失败", e);
@@ -112,7 +111,7 @@ public class ThirdPartyServiceImpl implements ThirdPartyService {
         GetWeatherRes getWeatherRes = new GetWeatherRes();
 
         // 从缓存中获取结果
-        String cachedResult = redisUtil.get(RedisEnum.WEATHER_CITY.getKey() + city);
+        String cachedResult = redisClient.get(RedisEnum.WEATHER_CITY.getKey() + city);
         if (cachedResult != null) {
             return JSONObject.parseObject(cachedResult, GetWeatherRes.class);
         }
@@ -157,7 +156,7 @@ public class ThirdPartyServiceImpl implements ThirdPartyService {
             LocalDateTime toDayLatestTime = LocalDate.now().atTime(23, 59, 59);
             long second = ChronoUnit.SECONDS.between(LocalDateTime.now(), toDayLatestTime);
             // 缓存有效期为当天23:59:59
-            redisUtil.set(RedisEnum.WEATHER_CITY.getKey() + city, result, second);
+            redisClient.set(RedisEnum.WEATHER_CITY.getKey() + city, result, second);
             return getWeatherRes;
         }catch (Exception e) {
             log.error("获取天气失败", e);

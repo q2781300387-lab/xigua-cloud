@@ -1,0 +1,356 @@
+/**
+ * IM Messenger Design Tokens
+ * 基于 Stitch 设计系统生成
+ * 创意方向: The Ethereal Curator (空灵策展人)
+ * 设计风格: Soft Minimalist (柔和极简主义)
+ */
+
+/* ========== 颜色系统 ========== */
+
+/* 主色调 */
+$primary: #32ABFD;
+$primary-container: #2998e3;
+$on-primary: #ffffff;
+
+/* 表面颜色 */
+$surface: #ffffff;
+$surface-bright: #f7f9fc;
+$surface-container-lowest: #ffffff;
+$surface-container-low: #f2f4f7;
+$surface-container: #eceef1;
+$surface-container-high: #F8F9FA;
+$surface-container-highest: #f3f4f6;
+$surface-dim: #d8dadd;
+$surface-variant: #e0e3e6;
+
+/* 背景颜色 */
+$background: #f7f9fc;
+$on-background: #191c1e;
+
+/* 文字颜色 */
+$on-surface: #1e1b13;
+$on-surface-variant: #6f7882;
+$inverse-on-surface: #eff1f4;
+$inverse-surface: #2d3133;
+
+/* 边框颜色 */
+$outline: #707785;
+$outline-variant: #bec7d3;
+
+/* 错误颜色 */
+$error: #ba1a1a;
+$error-container: #ffdad6;
+$on-error: #ffffff;
+$on-error-container: #93000a;
+
+/* 次要颜色 */
+$secondary: #3f608b;
+$secondary-container: #adceff;
+$on-secondary: #ffffff;
+$on-secondary-container: #365882;
+
+/* 第三颜色 */
+$tertiary: #944600;
+$tertiary-container: #ba5900;
+$on-tertiary: #ffffff;
+$on-tertiary-container: #fffbff;
+
+/* 品牌颜色 */
+$wechat-green: #07C160;
+$apple-black: #1e1b13;
+
+/* ========== 渐变 ========== */
+
+/* 背景渐变 */
+$gradient-background: linear-gradient(
+	180deg,
+	rgba(255, 255, 255, 0) 60%,
+	rgba(50, 171, 253, 0.08) 100%
+);
+
+/* 按钮渐变 */
+$gradient-primary: linear-gradient(135deg, #32ABFD 0%, #2998e3 100%);
+
+/* ========== 字体 ========== */
+
+/* 字体家族 */
+$font-headline: 'Manrope', -apple-system, BlinkMacSystemFont, 'PingFang SC',
+	'Microsoft YaHei', sans-serif;
+$font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'PingFang SC',
+	'Microsoft YaHei', sans-serif;
+$font-icon: 'Material Icons';
+
+/* 字体大小 (rpx) */
+$font-size-display-sm: 92rpx; // 36px
+$font-size-title-lg: 69rpx; // 27px
+$font-size-title-md: 58rpx; // 22.5px
+$font-size-body-lg: 35rpx; // 18px
+$font-size-body-md: 27rpx; // 14px
+$font-size-body-sm: 23rpx; // 12px
+$font-size-label-lg: 27rpx; // 14px
+$font-size-label-md: 23rpx; // 12px
+$font-size-label-sm: 19rpx; // 11px
+
+/* 字重 */
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+
+/* 行高 */
+$line-height-tight: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.6;
+$line-height-loose: 2;
+
+/* 字间距 */
+$letter-spacing-tight: -0.02em;
+$letter-spacing-normal: 0;
+$letter-spacing-wide: 0.2em;
+
+/* ========== 圆角 ========== */
+
+$radius-sm: 12rpx; // 6px
+$radius-md: 31rpx; // 16px
+$radius-lg: 38rpx; // 20px
+$radius-xl: 46rpx; // 24px
+$radius-2xl: 58rpx; // 30px
+$radius-3xl: 92rpx; // 48px
+$radius-full: 9999rpx;
+
+/* ========== 间距 ========== */
+
+/* 内边距 (padding) */
+$spacing-xs: 8rpx; // 4px
+$spacing-sm: 15rpx; // 8px
+$spacing-md: 23rpx; // 12px
+$spacing-lg: 31rpx; // 16px
+$spacing-xl: 46rpx; // 24px
+$spacing-2xl: 62rpx; // 32px
+$spacing-3xl: 77rpx; // 40px
+$spacing-4xl: 92rpx; // 48px
+$spacing-5xl: 123rpx; // 64px
+$spacing-6xl: 185rpx; // 96px
+
+/* 外边距 (margin) */
+$margin-xs: 8rpx;
+$margin-sm: 15rpx;
+$margin-md: 23rpx;
+$margin-lg: 31rpx;
+$margin-xl: 46rpx;
+$margin-2xl: 62rpx;
+$margin-3xl: 77rpx;
+$margin-4xl: 92rpx;
+
+/* 间隙 (gap) */
+$gap-xs: 8rpx;
+$gap-sm: 15rpx;
+$gap-md: 23rpx;
+$gap-lg: 31rpx;
+$gap-xl: 46rpx;
+$gap-2xl: 62rpx;
+
+/* ========== 尺寸 ========== */
+
+/* 容器宽度 */
+$container-max-width: 750rpx; // 最大宽度
+$container-padding: 62rpx; // 容器内边距
+
+/* 输入框 */
+$input-height: 108rpx; // 56px
+$input-padding-horizontal: 92rpx; // 48px
+$input-padding-vertical: 31rpx; // 16px
+$input-border-width: 2rpx; // 1px
+$input-radius: 46rpx; // 24px
+
+/* 按钮 */
+$button-height: 108rpx; // 56px
+$button-padding-horizontal: 62rpx; // 32px
+$button-padding-vertical: 31rpx; // 16px
+$button-radius: 9999rpx; // 完全圆角
+
+/* 图标 */
+$icon-size-sm: 38rpx; // 20px
+$icon-size-md: 46rpx; // 24px
+$icon-size-lg: 58rpx; // 30px
+$icon-size-xl: 92rpx; // 48px
+
+/* 最小触摸目标 */
+$touch-target-min: 88rpx; // 44px
+
+/* ========== 阴影 ========== */
+
+/* 柔和阴影 (Soft Shadow) */
+$shadow-soft: 0 8rpx 46rpx rgba(50, 171, 253, 0.15);
+
+/* 按钮阴影 */
+$shadow-button: 0 15rpx 46rpx rgba(50, 171, 253, 0.2);
+
+/* 卡片阴影 */
+$shadow-card: 0 4rpx 23rpx rgba(50, 171, 253, 0.12);
+
+/* 浮动阴影 */
+$shadow-floating: 0 12rpx 62rpx rgba(50, 171, 253, 0.18);
+
+/* ========== 动画 ========== */
+
+/* 过渡时间 */
+$transition-fast: 0.15s;
+$transition-normal: 0.3s;
+$transition-slow: 0.5s;
+
+/* 缓动函数 */
+$easing-ease-in: cubic-bezier(0.4, 0, 1, 1);
+$easing-ease-out: cubic-bezier(0, 0, 0.2, 1);
+$easing-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+/* 缩放效果 */
+$scale-hover: 0.98;
+$scale-active: 0.95;
+
+/* ========== Z-Index ========== */
+
+$z-index-base: 1;
+$z-index-dropdown: 10;
+$z-index-sticky: 20;
+$z-index-fixed: 30;
+$z-index-modal-backdrop: 40;
+$z-index-modal: 50;
+$z-index-popover: 60;
+$z-index-tooltip: 70;
+
+/* ========== 不透明度 ========== */
+
+$opacity-disabled: 0.5;
+$opacity-hover: 0.8;
+$opacity-active: 0.9;
+$opacity-subtle: 0.6;
+
+/* ========== 边框 ========== */
+
+$border-width-thin: 1rpx;
+$border-width-normal: 2rpx;
+$border-width-thick: 4rpx;
+
+$border-style: solid;
+
+/* ========== 断点 (Breakpoints) ========== */
+
+$breakpoint-sm: 640rpx; // 小屏幕
+$breakpoint-md: 750rpx; // 中等屏幕
+$breakpoint-lg: 1024rpx; // 大屏幕
+$breakpoint-xl: 1280rpx; // 超大屏幕
+
+/* ========== Mixins ========== */
+
+/* 文本溢出省略号 */
+@mixin text-ellipsis {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* 多行文本溢出省略号 */
+@mixin text-ellipsis-multiline($lines: 2) {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: $lines;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* Flex 居中 */
+@mixin flex-center {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Flex 垂直居中 */
+@mixin flex-center-vertical {
+	display: flex;
+	align-items: center;
+}
+
+/* Flex 水平居中 */
+@mixin flex-center-horizontal {
+	display: flex;
+	justify-content: center;
+}
+
+/* 绝对定位居中 */
+@mixin absolute-center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+/* 按钮重置 */
+@mixin button-reset {
+	padding: 0;
+	margin: 0;
+	border: none;
+	background: none;
+	outline: none;
+	cursor: pointer;
+}
+
+/* 输入框重置 */
+@mixin input-reset {
+	padding: 0;
+	margin: 0;
+	border: none;
+	background: none;
+	outline: none;
+	box-shadow: none;
+}
+
+/* ========== 使用示例 ========== */
+
+/*
+// 在组件中使用
+.my-button {
+  background: $gradient-primary;
+  border-radius: $button-radius;
+  height: $button-height;
+  padding: 0 $button-padding-horizontal;
+  color: $on-primary;
+  font-family: $font-headline;
+  font-size: $font-size-body-lg;
+  font-weight: $font-weight-bold;
+  box-shadow: $shadow-button;
+  transition: all $transition-normal $easing-ease-in-out;
+
+  &:hover {
+    opacity: $opacity-hover;
+    transform: scale($scale-hover);
+  }
+
+  &:active {
+    transform: scale($scale-active);
+  }
+}
+
+.my-input {
+  height: $input-height;
+  padding: $input-padding-vertical $input-padding-horizontal;
+  background-color: $surface-container-high;
+  border-radius: $input-radius;
+  border: $border-width-normal $border-style transparent;
+  color: $on-surface;
+  font-family: $font-body;
+  font-size: $font-size-body-md;
+
+  &:focus {
+    border-color: $primary;
+    background-color: $surface;
+  }
+
+  &::placeholder {
+    color: $outline-variant;
+    opacity: $opacity-subtle;
+  }
+}
+*/

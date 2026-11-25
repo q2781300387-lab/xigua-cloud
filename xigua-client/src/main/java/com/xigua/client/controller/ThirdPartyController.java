@@ -1,15 +1,17 @@
 package com.xigua.client.controller;
 
 import com.xigua.client.utils.IpUtil;
-import com.xigua.domain.result.R;
+import com.xigua.common.core.base.R;
 import com.xigua.domain.thirdparty.GetLocationRes;
 import com.xigua.domain.thirdparty.GetWeatherRes;
 import com.xigua.api.service.ThirdPartyService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +35,9 @@ public class ThirdPartyController {
      * @param request
      * @return String
      */
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "查询成功", content =
+            { @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = GetLocationRes.class)) })})
     @Operation(summary = "根据ip获取地址")
     @GetMapping("/getLocation")
     public R<GetLocationRes> getLocation(HttpServletRequest request){
@@ -47,6 +52,9 @@ public class ThirdPartyController {
      * @param city
      * @return GetWeatherRes
      */
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "查询成功", content =
+            { @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = GetWeatherRes.class)) })})
     @Operation(summary = "根据城市获取天气")
     @PostMapping("/getWeather")
     public R<GetWeatherRes> getWeather(@RequestParam("city") String city){

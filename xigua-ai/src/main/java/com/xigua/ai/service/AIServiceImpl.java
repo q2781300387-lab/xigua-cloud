@@ -2,63 +2,55 @@ package com.xigua.ai.service;
 
 import com.xigua.ai.agent.Agent;
 import com.xigua.ai.agent.model.AgentContext;
-import com.xigua.ai.enums.Prompt;
-import com.xigua.ai.intent.IntentType;
-import com.xigua.ai.llm.model.ChatContext;
-import com.xigua.ai.intent.IntentRecognizer;
+import com.xigua.ai.domain.dto.ChatRequest;
 import com.xigua.ai.llm.LLMService;
-import com.xigua.ai.utils.PromptUtil;
-import com.xigua.api.service.*;
+import com.xigua.ai.llm.model.ChatContext;
+import com.xigua.ai.llm.model.Memory;
+import com.xigua.api.service.AiMemoryService;
+import com.xigua.api.service.AiMessageService;
+import com.xigua.api.service.AiSessionService;
 import com.xigua.common.core.exception.BusinessException;
+import com.xigua.common.redis.client.RedisClient;
+import com.xigua.common.sequence.sequence.Sequence;
+import com.xigua.domain.bo.AiMemoryBO;
+import com.xigua.domain.entity.AiSession;
+import com.xigua.domain.enums.RedisEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName AIServiceImpl
- * @Description TODO
+ * @Description
  * @Author wangjinfei
- * @Date 2025/9/20 13:08
+ * @Date 2026/2/24 19:54
  */
 @Slf4j
 @Service
-@DubboService
-public class AIServiceImpl extends DubboAIServiceTriple.AIServiceImplBase {
+public class AIServiceImpl implements AIService {
+    @Autowired
+    private RedisClient redisClient;
     @Autowired
     private LLMService llmService;
     @Autowired
-    private IntentRecognizer intentRecognizer;
-
-    @Autowired
     private Agent agent;
+    @Autowired
+    private Sequence sequence;
+    @Autowired
+    private AiSessionService aiSessionService;
+    @Autowired
+    private AiMessageService aiMessageService;
+    @Autowired
+    private AiMemoryService aiMemoryService;
 
     @Override
-    public Flux<ChatResponse> chat(Mono<ChatRequest> request) {
-        // 阻塞等待请求完成
-        ChatRequest req = request.block();
-        String input = req.getInput();
-        boolean stream = req.getStream();
-        String prompt = req.getPrompt();
-
-        if(StringUtils.isEmpty(prompt)){
-            // 获取默认提示词
-            prompt = PromptUtil.getPrompt(Prompt.DEFAULT);
-        }
-
-        ChatContext chatContext = ChatContext.builder()
-                .input(input)
-                .prompt(prompt)
-                .stream(stream)
-                .build();
+    public Flux<String> chat(ChatContext chatContext) {
         Flux<String> output = null;
         try {
             output = llmService.chat(chatContext);
@@ -67,39 +59,88 @@ public class AIServiceImpl extends DubboAIServiceTriple.AIServiceImplBase {
             throw new BusinessException("调用LLM服务失败");
         }
 
-        // Flux<String> 转 Flux<ChatResponse>
-        Flux<ChatResponse> responseFlux = output.map(s ->
-                ChatResponse.newBuilder().setOutput(s).build()
-        );
-        return responseFlux;
+        return output;
     }
 
     @Override
-    public Mono<IntentResponse> detectIntent(Mono<IntentRequest> reactorRequest) {
-        IntentType intentType = intentRecognizer.detect(reactorRequest.block().getInput());
-        // 解析意图
-        IntentResponse intentResponse = IntentResponse.newBuilder()
-                .setIntent(intentType.getType())
-                .build();
-        return Mono.just(intentResponse);
+    public Flux<ServerSentEvent<String>> chatSession(ChatRequest request) {
+        if(StringUtils.isEmpty(request.getSessionId())){
+           throw new BusinessException("sessionId不能为空");
+        }else{
+            // 保存用户对话
+            aiMessageService.saveUserMessage(request.getSessionId(), request.getInput());
+        }
+
+        // todo 随session带上下文，传入llm （从redis查）
+        List<AiMemoryBO> memory = aiMemoryService.refreshMemory(request.getSessionId(), 30);
+        List<Memory> memoryList = memory.stream()
+                .map(aiMemoryBO -> {
+                    Memory mem = new Memory();
+                    mem.setRole(aiMemoryBO.getRole());
+                    mem.setContent(aiMemoryBO.getContent());
+                    return mem;
+                })
+                .collect(Collectors.toList());
+
+        Flux<ServerSentEvent<String>> output;
+        StringBuilder completeOutputBuilder = new StringBuilder();
+        try {
+            AgentContext agentContext = AgentContext.builder()
+                    .requestId(request.getSessionId())
+                    .systemPrompt(getSystemPrompt(request.getSessionId()))
+                    .model(getSessionModel(request.getSessionId()))
+                    .input(request.getInput())
+                    .memory(memoryList)
+                    .stream(true)
+                    .build();
+            output = agent.process(agentContext)
+                    .doOnNext(event -> {
+                        // 只累积 message 类型的内容，跳过 status
+                        if ("message".equals(event.event())) {
+                            completeOutputBuilder.append(event.data());
+                        }
+                    })
+                    .doOnComplete(() -> {
+                        // 持久化
+                        String completeOutput = completeOutputBuilder.toString();
+                        aiMessageService.saveAiMessage(request.getSessionId(), completeOutput);
+                    })
+                    .doOnError(e -> {
+                        log.error("流处理错误", e);
+                    });
+        } catch (Exception e) {
+            log.error("调用LLM服务失败", e);
+            throw new BusinessException("调用LLM服务失败");
+        }
+
+        return output;
     }
 
-    @Override
-    public Flux<AgentResponse> agentProcess(Mono<AgentRequest> request) {
-        AgentRequest req = request.block();
-        Boolean stream = req.getStream();
+    /**
+     * 获取会话选择的模型
+     */
+    private String getSessionModel(String sessionId){
+        AiSession aiSession = redisClient.get(RedisEnum.AI_SESSION.getKey() + sessionId, AiSession.class);
+        if(aiSession != null && StringUtils.isNotEmpty(aiSession.getModel())){
+            return aiSession.getModel();
+        }
 
-        log.info("agentProcess开始处理，requestId: {}，入参: {}", req.getRequestId(), req);
-        Flux<String> output = agent.process(AgentContext.builder()
-                 .requestId(req.getRequestId())
-                .input(req.getInput())
-                .stream(stream)
-                .systemPrompt(req.getPrompt())
-                .build());
-        log.info("agentProcess处理完成，requestId: {}", req.getRequestId());
+        return null;
+    }
 
-        return output.map(s ->
-                AgentResponse.newBuilder().setOutput(s).build()
-        );
+    /**
+     * 获取系统提示词
+     * @author wangjinfei
+     * @date 2026/2/25 13:40
+     * @param sessionId
+     * @return String
+     */
+    private String getSystemPrompt(String sessionId){
+        AiSession aiSession = redisClient.get(RedisEnum.AI_SESSION.getKey() + sessionId, AiSession.class);
+        if(aiSession != null){
+            return aiSession.getSystemPrompt();
+        }
+
+        return "";
     }
 }

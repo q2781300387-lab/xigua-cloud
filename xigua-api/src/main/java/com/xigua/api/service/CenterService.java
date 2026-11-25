@@ -47,21 +47,18 @@ public interface CenterService {
     void sendMessage2Client(MessageResponse messageResponse, Client client);
 
     /**
+     * 推送到该用户当前所有在线节点（多端/多实例）
+     */
+    void sendMessage2User(MessageResponse messageResponse, String userId);
+
+    /**
      * 用户是否在线
      * @author wangjinfei
      * @date 2025/4/20 11:42
      * @param userId
      * @return Boolean
      */
-    String onlineUser(String userId);
-
-    /**
-     * 获取在线人员id
-     * @author wangjinfei
-     * @date 2025/4/23 19:52
-     * @return List<String>
-    */
-    Set<String> getOnlineId();
+    Client onlineUser(String userId);
 
     /**
      * 根据用户id判断是否在线

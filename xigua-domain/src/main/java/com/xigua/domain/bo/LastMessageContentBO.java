@@ -1,5 +1,6 @@
 package com.xigua.domain.bo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.io.Serializable;
  * @Date 2025/7/18 13:47
  */
 @Data
+@Schema(description = "最后一条消息内容")
 public class LastMessageContentBO implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -18,6 +20,7 @@ public class LastMessageContentBO implements Serializable {
     /**
      * 消息内容
      */
+     @Schema(description = "消息内容")
     private String content;
 
     // todo 后续可能扩展的字段

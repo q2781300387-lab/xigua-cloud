@@ -4,21 +4,17 @@ import com.alibaba.fastjson2.JSONObject;
 import com.xigua.center.wsMessage.MessageServiceFactory;
 import com.xigua.center.wsMessage.AbstractMessageService;
 import com.xigua.common.core.exception.BusinessException;
-import com.xigua.common.core.util.RedisUtil;
+import com.xigua.common.redis.client.RedisClient;
 import com.xigua.domain.connect.Client;
 import com.xigua.domain.ws.MessageRequest;
 import com.xigua.domain.enums.MessageSubType;
 import com.xigua.domain.enums.MessageType;
 import com.xigua.domain.enums.RedisEnum;
-import com.xigua.api.service.ClientService;
 import com.xigua.api.service.CenterService;
 import com.xigua.domain.ws.MessageResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.ReferenceConfig;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.apache.dubbo.rpc.cluster.specifyaddress.Address;
-import org.apache.dubbo.rpc.cluster.specifyaddress.UserSpecifiedAddressUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,8 +31,12 @@ import java.util.Set;
 @Service
 @DubboService
 public class CenterServiceImpl implements CenterService {
+    private static final String ONLINE_USER_CLIENTS = "ONLINE_USER:CLIENTS:";
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
+
+    @Autowired
+    private ClientPushService clientPushService;
 
     /**
      * 客户端注册上线
@@ -49,17 +49,20 @@ public class CenterServiceImpl implements CenterService {
         // 客户端ws节点信息存储到redis
         String host = client.getHost();
         Integer port = client.getPort();
-        String key = RedisEnum.CLIENT_CONNECT_CENTER.getKey() + host + ":" + port;
-        redisUtil.set(key, JSONObject.toJSONString(client));
 
 
         /**
          * todo可能服务器直接挂了，但redis还存储着在线用户
          * 需要维护一个过期时间,或者心跳检测
         */
-        // 存储在线用户
-        String onlineUserKey = RedisEnum.ONLINE_USER.getKey() + host + ":" + port;
-        redisUtil.sadd(onlineUserKey, userId);
+        // 存储在线用户：旧 key 保留一个节点做兼容，set 记录该用户所有节点，支持多实例/多端
+        String clientJson = JSONObject.toJSONString(client);
+        redisClient.set(RedisEnum.ONLINE_USER.getKey() + userId, clientJson);
+        redisClient.sadd(ONLINE_USER_CLIENTS + userId, clientJson);
+        // 立即写入心跳时间。否则新连接在首个 ping 到达前会被巡检任务判定为“无心跳”并强制下线，
+        // 表现为手机能发消息却收不到任何推送（视频通话 accept / offer 全部丢失）。
+        redisClient.set(RedisEnum.LAST_PING_TIME.getKey() + userId, String.valueOf(System.currentTimeMillis()));
+        redisClient.sadd(RedisEnum.ONLINE_NODE_USER.getKey() + host, userId);
 
         // 通知好友用户上线
         MessageRequest messageRequest = new MessageRequest();
@@ -71,7 +74,7 @@ public class CenterServiceImpl implements CenterService {
             throw new BusinessException("未找到消息服务");
         }
         messageService.handleMessage(messageRequest);
-        log.info("------->>>>>>> 用户：{}，所在服务器：{}，注册上线", userId, key);
+        log.info("------->>>>>>> 用户：{}，所在服务器：{}，注册上线", userId, host);
     }
 
     /**
@@ -86,21 +89,21 @@ public class CenterServiceImpl implements CenterService {
         String host = client.getHost();
         Integer port = client.getPort();
 
-        // redis移除在线用户
-        String onlineUserKey = RedisEnum.ONLINE_USER.getKey() + host + ":" + port;
-        redisUtil.srem(onlineUserKey, userId);
+        // redis移除当前节点；若还有其他节点，旧 key 指向剩余节点
+        String clientJson = JSONObject.toJSONString(client);
+        redisClient.srem(ONLINE_USER_CLIENTS + userId, clientJson);
+        Set<Object> remaining = redisClient.members(ONLINE_USER_CLIENTS + userId);
+        if (remaining == null || remaining.isEmpty()) {
+            redisClient.del(RedisEnum.ONLINE_USER.getKey() + userId);
+            redisClient.del(RedisEnum.LAST_PING_TIME.getKey() + userId);
+        } else {
+            redisClient.set(RedisEnum.ONLINE_USER.getKey() + userId, String.valueOf(remaining.iterator().next()));
+        }
+        redisClient.srem(RedisEnum.ONLINE_NODE_USER.getKey() + host, userId);
 
         // redis删除当前用户的活跃好友
         String currentActiveFriendKey = RedisEnum.CURRENT_CHAT_WINDOW.getKey() + userId;
-        redisUtil.del(currentActiveFriendKey);
-
-        // 如果当前节点没有在线用户了，移除节点信息
-        String wsClientKey = RedisEnum.CLIENT_CONNECT_CENTER.getKey() + host + ":" + port;
-        long wsClientSize = redisUtil.scard(onlineUserKey);
-        if(wsClientSize == 0){
-            // 客户端ws节点信息从redis移除
-            redisUtil.del(wsClientKey);
-        }
+        redisClient.del(currentActiveFriendKey);
 
         // 通知好友用户下线
         MessageRequest messageRequest = new MessageRequest();
@@ -113,7 +116,7 @@ public class CenterServiceImpl implements CenterService {
         }
         messageService.handleMessage(messageRequest);
 
-        log.info("------->>>>>>> 用户：{}，所在服务器：{}，注销下线", userId, wsClientKey);
+        log.info("------->>>>>>> 用户：{}，所在服务器：{}，注销下线", userId, host);
     }
 
     /**
@@ -126,6 +129,9 @@ public class CenterServiceImpl implements CenterService {
     public void receiveMessage4Client(MessageRequest messageRequest) {
         String messageType = messageRequest.getMessageType();
         String subType = messageRequest.getSubType();
+        if(messageRequest.getServerReceiveTime() == null){
+            messageRequest.setServerReceiveTime(System.currentTimeMillis());
+        }
 
         log.info("------->>>>>>> 接收到客户端消息：{}", messageRequest);
 
@@ -147,10 +153,10 @@ public class CenterServiceImpl implements CenterService {
      * @param userId
      * @return Boolean
      */
-    public String onlineUser(String userId) {
+    public Client onlineUser(String userId) {
         // 获取在线用户所在的节点信息
-        String onlineKey = redisUtil.isValueInSet(userId, RedisEnum.ONLINE_USER.getKey() + "*");
-        return onlineKey;
+        Client client = redisClient.get(RedisEnum.ONLINE_USER.getKey() + userId, Client.class);
+        return client;
     }
 
     /**
@@ -161,43 +167,29 @@ public class CenterServiceImpl implements CenterService {
      */
     @Override
     public void sendMessage2Client(MessageResponse messageResponse, Client client) {
-        String host = client.getHost();
-        Integer dubboPort = client.getDubboPort();
-
-        // 通过ip和port指定节点 进行rpc调用 发送消息
-        ReferenceConfig<ClientService> referenceConfig = new ReferenceConfig<>();
-        referenceConfig.setInterface(ClientService.class);
-        ClientService clientService = referenceConfig.get();
-        UserSpecifiedAddressUtil.setAddress(new Address(host, dubboPort, true));
-        clientService.receiveMessage4Center(messageResponse);
+        clientPushService.push(client, messageResponse);
     }
 
-    /**
-     * 获取在线人员id
-     * @author wangjinfei
-     * @date 2025/4/23 19:52
-     * @return List<String>
-     */
     @Override
-    public Set<String> getOnlineId() {
-        Set<String> onlineIds = new HashSet<>();
-
-        // 获取所有的节点信息
-        String key = RedisEnum.CLIENT_CONNECT_CENTER.getKey() + "*";
-        Set<String> wsServers = redisUtil.getKeysByKey(key);
-
-        // 根据节点信息获取在线用户
-        for (String wsServer : wsServers) {
-            int index = wsServer.indexOf(":");
-            String wsServerKey = RedisEnum.ONLINE_USER.getKey() + wsServer.substring(index + 1);
-            Set<Object> members = redisUtil.members(wsServerKey);
-
-            members.forEach(member -> {
-                onlineIds.add((String) member);
-            });
+    public void sendMessage2User(MessageResponse messageResponse, String userId) {
+        Set<Object> members = redisClient.members(ONLINE_USER_CLIENTS + userId);
+        if (members == null || members.isEmpty()) {
+            Client client = onlineUser(userId);
+            if (client != null) {
+                clientPushService.push(client, messageResponse);
+            }
+            return;
         }
-
-        return onlineIds;
+        for (Object member : members) {
+            try {
+                Client client = JSONObject.parseObject(String.valueOf(member), Client.class);
+                if (client != null) {
+                    clientPushService.push(client, messageResponse);
+                }
+            } catch (Exception e) {
+                log.warn("推送用户 {} 的节点失败: {}", userId, e.getMessage());
+            }
+        }
     }
 
     /**
@@ -209,8 +201,8 @@ public class CenterServiceImpl implements CenterService {
      */
     @Override
     public Boolean isOnline(String userId) {
-        String onlineKey = onlineUser(userId);
-        if(StringUtils.isEmpty(onlineKey)){
+        Client client = onlineUser(userId);
+        if(client == null){
             return false;
         }
         return true;

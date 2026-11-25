@@ -16,9 +16,15 @@ import java.io.Serializable;
 public class LoginDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Schema(name = "username", description = "用户名")
+    @Schema(description = "用户名")
     private String username;
 
-    @Schema(name = "password", description = "密码")
+    @Schema(description = "密码")
     private String password;
+
+    @Schema(description = "验证码ID（登录失败次数过多时必填）")
+    private String captchaId;
+
+    @Schema(description = "验证码答案")
+    private String captchaCode;
 }

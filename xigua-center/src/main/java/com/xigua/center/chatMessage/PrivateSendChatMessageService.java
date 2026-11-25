@@ -5,7 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.xigua.api.service.CenterService;
 import com.xigua.api.service.MessageReadService;
 import com.xigua.common.core.util.DateUtil;
-import com.xigua.common.core.util.RedisUtil;
+import com.xigua.common.redis.client.RedisClient;
 import com.xigua.common.sequence.sequence.Sequence;
 import com.xigua.domain.bo.LastMessageBO;
 import com.xigua.domain.bo.LastMessageContentBO;
@@ -34,15 +34,17 @@ public class PrivateSendChatMessageService extends AbstractSendChatMessageServic
     @Autowired
     private Sequence sequence;
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
     @Autowired
     private CenterService centerService;
     @Autowired
     private MessageReadService messageReadService;
+    @Autowired
+    private com.xigua.center.service.PushService pushService;
 
     @Override
     protected ChatType getChatType() {
-        return ChatType.ONE;
+        return ChatType.PRIVATE;
     }
 
     @Override
@@ -72,11 +74,17 @@ public class PrivateSendChatMessageService extends AbstractSendChatMessageServic
         String receiverId = messageRequest.getReceiverId();
         long timestamp = System.currentTimeMillis();
 
-        // 存储redis 最后消息
-        redisUtil.zsadd(RedisEnum.LAST_MES.getKey() + receiverId, senderId, timestamp);
-        // 存储redis 最后消息内容
-        LastMessageBO lastMessageBO = chatMessageDTO2LastMessageBO(messageRequest);
-        redisUtil.hashPut(RedisEnum.LAST_MES_CONTENT.getKey() + receiverId, senderId, JSONObject.toJSONString(lastMessageBO));
+        // 存储redis 最后消息 （接收人）
+        redisClient.zsadd(RedisEnum.LAST_MES.getKey() + receiverId, senderId, timestamp);
+        // 最后消息内容
+        LastMessageBO lastMessage4Sender = buildLastMessage4Receiver(messageRequest);
+        redisClient.hashPut(RedisEnum.LAST_MES_CONTENT.getKey() + receiverId, senderId, JSONObject.toJSONString(lastMessage4Sender));
+
+        // 存储redis 最后消息 （发送人）
+        redisClient.zsadd(RedisEnum.LAST_MES.getKey() + senderId, receiverId, timestamp);
+        LastMessageBO lastMessage4Receiver = buildLastMessage4Sender(messageRequest);
+        redisClient.hashPut(RedisEnum.LAST_MES_CONTENT.getKey() + senderId, receiverId, JSONObject.toJSONString(lastMessage4Receiver));
+
     }
 
     /**
@@ -86,17 +94,17 @@ public class PrivateSendChatMessageService extends AbstractSendChatMessageServic
      * @param messageRequest
      * @return LastMessageBO
      */
-    private LastMessageBO chatMessageDTO2LastMessageBO(MessageRequest messageRequest){
+    private LastMessageBO buildLastMessage4Receiver(MessageRequest messageRequest){
         LastMessageBO lastMessageBO = new LastMessageBO();
         LastMessageContentBO lastMessageContent = new LastMessageContentBO();
         String senderId = messageRequest.getSenderId();
 
         lastMessageBO.setChatId(senderId);
-        lastMessageBO.setChatType(ChatType.ONE.getType());
+        lastMessageBO.setChatType(ChatType.PRIVATE.getType());
         lastMessageBO.setUpdateTime(System.currentTimeMillis());
 
         // 用户信息
-        String userCache = redisUtil.get(RedisEnum.USER.getKey() + senderId);
+        String userCache = redisClient.get(RedisEnum.USER.getKey() + senderId);
         if(StringUtils.isNotEmpty(userCache)){
             User user = JSONObject.parseObject(userCache, User.class);
             lastMessageBO.setChatName(user.getUsername());
@@ -108,7 +116,35 @@ public class PrivateSendChatMessageService extends AbstractSendChatMessageServic
         }
 
         // 封装 最后消息内容
-        lastMessageContent.setContent(messageRequest.getMessage());
+        lastMessageContent.setContent(lastMessageSummary(messageRequest));
+        lastMessageBO.setLastMessageContent(lastMessageContent);
+
+        return lastMessageBO;
+    }
+
+    private LastMessageBO buildLastMessage4Sender(MessageRequest messageRequest){
+        LastMessageBO lastMessageBO = new LastMessageBO();
+        LastMessageContentBO lastMessageContent = new LastMessageContentBO();
+        String receiverId = messageRequest.getReceiverId();
+
+        lastMessageBO.setChatId(receiverId);
+        lastMessageBO.setChatType(ChatType.PRIVATE.getType());
+        lastMessageBO.setUpdateTime(System.currentTimeMillis());
+
+        // 用户信息
+        String userCache = redisClient.get(RedisEnum.USER.getKey() + receiverId);
+        if(StringUtils.isNotEmpty(userCache)){
+            User user = JSONObject.parseObject(userCache, User.class);
+            lastMessageBO.setChatName(user.getUsername());
+            lastMessageBO.setAvatar(user.getAvatar());
+        }else{
+            // 从数据库获取用户信息
+            lastMessageBO.setAvatar("");
+            lastMessageBO.setChatName("");
+        }
+
+        // 封装 最后消息内容
+        lastMessageContent.setContent(lastMessageSummary(messageRequest));
         lastMessageBO.setLastMessageContent(lastMessageContent);
 
         return lastMessageBO;
@@ -122,23 +158,17 @@ public class PrivateSendChatMessageService extends AbstractSendChatMessageServic
      */
     @Override
     public void chatMessage2Receiver(MessageRequest messageRequest) {
-        // 获取接收人所在的节点信息
-        String receiverInServer = centerService.onlineUser(messageRequest.getReceiverId());
-        if(StringUtils.isEmpty(receiverInServer)){
-            // 如果接收人不在线，直接返回，不做后续处理
+        // 接收人不在线：走 Web Push 兜底，页面关闭时也能收到系统通知
+        if(!centerService.isOnline(messageRequest.getReceiverId())){
+            pushService.pushChatMessage(messageRequest);
             return;
         }
-        // 获取接收者所在的节点信息
-        String key = RedisEnum.CLIENT_CONNECT_CENTER.getKey() +
-                receiverInServer.split(":")[1] + ":" + receiverInServer.split(":")[2];
-        String value = redisUtil.get(key);
-        Client client = JSONObject.parseObject(value, Client.class);
 
-        // 实时推送消息，发送到接收人所在节点
+        // 实时推送消息，发送到接收人所有在线节点
         MessageResponse messageResponse = new MessageResponse();
         BeanUtils.copyProperties(messageRequest, messageResponse);
         messageResponse.setSubType(MessageSubType.MES_RECEIVE.getType());
-        centerService.sendMessage2Client(messageResponse, client);
+        centerService.sendMessage2User(messageResponse, messageRequest.getReceiverId());
     }
 
     /**
@@ -153,18 +183,18 @@ public class PrivateSendChatMessageService extends AbstractSendChatMessageServic
         String receiverId = messageRequest.getReceiverId();
 
         // 获取接收人所在的节点信息
-        String receiverInServer = centerService.onlineUser(messageRequest.getReceiverId());
+        Client receiverClient = centerService.onlineUser(messageRequest.getReceiverId());
 
         // 获取接收人打开的聊天窗口好友是谁
-        String receiverActiveFriend = redisUtil.get(RedisEnum.CURRENT_CHAT_WINDOW.getKey() + receiverId);
+        String receiverActiveFriend = redisClient.get(RedisEnum.CURRENT_CHAT_WINDOW.getKey() + receiverId);
 
         // 存储redis 好友未读数量
         String friendUnreadCountKey = RedisEnum.FRIEND_UNREAD_COUNT.getKey() + receiverId;
 
         // 接收人在线 && 打开聊天框是发送人
-        if(StringUtils.isNotEmpty(receiverInServer) && senderId.equals(receiverActiveFriend)){
+        if(receiverClient != null && senderId.equals(receiverActiveFriend)){
             // 未读消息清零
-            redisUtil.hashPut(friendUnreadCountKey, senderId, 0);
+            redisClient.hashPut(friendUnreadCountKey, senderId, 0);
         }else{
             /**
              * 如果使用hash先获取，再put +1，时间复杂度是O(1) + O(1)
@@ -173,7 +203,11 @@ public class PrivateSendChatMessageService extends AbstractSendChatMessageServic
              */
 
             // 使用redis中的hincrby命令  未读消息 + 1
-            redisUtil.hincrby(friendUnreadCountKey, senderId, 1);
+            redisClient.hincrby(friendUnreadCountKey, senderId, 1);
+
+            // 给接收人增加总未读数
+            String chatUnreadCountKey = RedisEnum.CHAT_UNREAD_COUNT.getKey() + receiverId;
+            redisClient.incrby(chatUnreadCountKey, 1);
         }
     }
 
@@ -189,13 +223,13 @@ public class PrivateSendChatMessageService extends AbstractSendChatMessageServic
         String receiverId = messageRequest.getReceiverId();
 
         // 获取接收人所在的节点信息
-        String receiverInServer = centerService.onlineUser(messageRequest.getReceiverId());
-        if(StringUtils.isEmpty(receiverInServer)){
+        Client receiverClient = centerService.onlineUser(messageRequest.getReceiverId());
+        if(receiverClient == null){
             return;
         }
 
         // 获取接收人打开的聊天窗口好友是谁
-        String receiverActiveFriend = redisUtil.get(RedisEnum.CURRENT_CHAT_WINDOW.getKey() + receiverId);
+        String receiverActiveFriend = redisClient.get(RedisEnum.CURRENT_CHAT_WINDOW.getKey() + receiverId);
         if (StringUtils.isEmpty(receiverActiveFriend)) {
             return;
         }
@@ -205,15 +239,9 @@ public class PrivateSendChatMessageService extends AbstractSendChatMessageServic
         }
 
         // 接收人打开的聊天窗口好友是发送人，发送已读通知  （对方在线 && 对方打开的聊天框是发送人）
-        // 获取发送人所在的节点信息
-        String userInServer = centerService.onlineUser(senderId);
-        if (StringUtils.isEmpty(userInServer)) {
+        if (!centerService.isOnline(senderId)) {
             return;
         }
-        String key = RedisEnum.CLIENT_CONNECT_CENTER.getKey() +
-                userInServer.split(":")[1] + ":" + userInServer.split(":")[2];
-        String value = redisUtil.get(key);
-        Client client = JSONObject.parseObject(value, Client.class);
 
         // 系统推送已读通知
         MessageResponse messageResponse = new MessageResponse();
@@ -226,7 +254,7 @@ public class PrivateSendChatMessageService extends AbstractSendChatMessageServic
 
         messageResponse.setMessage(json);
         messageResponse.setCreateTime(DateUtil.formatDateTime(LocalDateTime.now(), DateUtil.DATE_TIME_FORMATTER));
-        centerService.sendMessage2Client(messageResponse, client);
+        centerService.sendMessage2User(messageResponse, senderId);
 
         // 标记为已读
         messageReadService.markRead(messageRequest.getChatMessageId(), receiverId);

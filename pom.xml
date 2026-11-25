@@ -42,6 +42,11 @@
         <protoc.version>3.19.6</protoc.version>
         <grpc.version>1.63.0</grpc.version>
         <beanutils.version>1.11.0</beanutils.version>
+        <ip2region.version>3.3.6</ip2region.version>
+        <oshi.version>6.10.0</oshi.version>
+        <yauaa.version>8.1.0</yauaa.version>
+        <icmp4j.version>1.2</icmp4j.version>
+        <tinypinyin.version>2.0.3</tinypinyin.version>
     </properties>
 
     <!-- 模块   -->
@@ -53,6 +58,8 @@
         <module>xigua-client</module>
         <module>xigua-center</module>
         <module>xigua-ai</module>
+        <module>xigua-admin</module>
+        <module>xigua-search</module>
     </modules>
 
     <profiles>
@@ -77,7 +84,7 @@
                 <profiles.active>dev</profiles.active>
                 <nacos.username>nacos</nacos.username>
                 <nacos.password>nacos</nacos.password>
-                <nacos.server>x.x.x.x:8848</nacos.server>
+                <nacos.server>172.24.55.86:8848</nacos.server>
             </properties>
         </profile>
     </profiles>
@@ -87,12 +94,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

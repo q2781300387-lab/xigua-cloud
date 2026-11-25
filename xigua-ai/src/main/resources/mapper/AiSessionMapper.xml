@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xigua.ai.mapper.AiSessionMapper">
+
+    <select id="pageSessions" resultType="com.xigua.domain.entity.AiSession">
+        select * from xg_ai_session
+        <where>
+            del_flag = 0
+            <if test="query.botId != null and query.botId != null">
+                and bot_id = #{query.botId}
+            </if>
+            <if test="query.userId != null and query.userId != null">
+                and user_id = #{query.userId}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+</mapper>

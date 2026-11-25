@@ -3,8 +3,9 @@ package com.xigua.client.service;
 import com.alibaba.fastjson2.JSONObject;
 import com.xigua.api.service.*;
 import com.xigua.common.core.util.DateUtil;
-import com.xigua.common.core.util.RedisUtil;
+import com.xigua.common.core.util.FirstLetterUtil;
 import com.xigua.common.core.util.UserContext;
+import com.xigua.common.redis.client.RedisClient;
 import com.xigua.domain.entity.Bot;
 import com.xigua.domain.entity.FriendRequest;
 import com.xigua.domain.entity.Group;
@@ -19,9 +20,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,8 +40,12 @@ public class ContactServiceImpl implements ContactService {
     @Autowired
     private GroupMemberService groupMemberService;
     @Autowired
-    private RedisUtil redisUtil;
+    private GroupService groupService;
     @Autowired
+    private RedisClient redisClient;
+    @Autowired
+    private UserService userService;
+    @DubboReference
     private BotService botService;
     @DubboReference
     private CenterService centerService;
@@ -96,11 +99,19 @@ public class ContactServiceImpl implements ContactService {
         for (String friendId : friendIds) {
             // todo 可以批量获取
             // 从redis获取用户信息
-            String friendCache = redisUtil.get(RedisEnum.USER.getKey() + friendId);
+            String friendCache = redisClient.get(RedisEnum.USER.getKey() + friendId);
+            User user;
             if(StringUtils.isEmpty(friendCache)){
-                continue;
+                // 缓存未命中时回查数据库并回填：直接写库导入的用户没有 user: 缓存，
+                // 这里直接 continue 会让“好友 (N)”的数字和展开后的列表对不上
+                user = userService.getById(friendId);
+                if (user == null) {
+                    continue;
+                }
+                redisClient.set(RedisEnum.USER.getKey() + friendId, JSONObject.toJSONString(user));
+            } else {
+                user = JSONObject.parseObject(friendCache, User.class);
             }
-            User user = JSONObject.parseObject(friendCache, User.class);
 
             FriendVO friendVO = new FriendVO();
             friendVO.setUserId(friendId);
@@ -113,6 +124,47 @@ public class ContactServiceImpl implements ContactService {
             voList.add(friendVO);
         }
         return voList;
+    }
+
+    /**
+     * 获取按字母分组的好友列表
+     * @author wangjinfei
+     * @date 2026/4/15
+     * @return List<FriendGroupVO>
+     */
+    @Override
+    public List<FriendGroupVO> firstLetterFriends() {
+        // 获取所有好友列表
+        List<FriendVO> friendList = getFriendList();
+        if (CollectionUtils.isEmpty(friendList)) {
+            return new ArrayList<>();
+        }
+
+        // 按首字母分组
+        Map<String, List<FriendVO>> groupedMap = friendList.stream()
+                .collect(Collectors.groupingBy(friend ->
+                    FirstLetterUtil.getFirstLetter(friend.getUsername()),
+                    LinkedHashMap::new,
+                    Collectors.toList()
+                ));
+
+        // 转换为 FriendGroupVO 列表并按字母排序
+        List<FriendGroupVO> result = groupedMap.entrySet().stream()
+                .map(entry -> {
+                    FriendGroupVO groupVO = new FriendGroupVO();
+                    groupVO.setLetter(entry.getKey());
+                    groupVO.setList(entry.getValue());
+                    return groupVO;
+                })
+                .sorted(Comparator.comparing(FriendGroupVO::getLetter, (letter1, letter2) -> {
+                    // # 排在最后
+                    if ("#".equals(letter1)) return 1;
+                    if ("#".equals(letter2)) return -1;
+                    return letter1.compareTo(letter2);
+                }))
+                .collect(Collectors.toList());
+
+        return result;
     }
 
     /**
@@ -134,9 +186,16 @@ public class ContactServiceImpl implements ContactService {
             return voList;
         }
         for (String groupId : groupIds) {
-            String groupCache = redisUtil.get(RedisEnum.GROUP.getKey() + groupId);
+            String groupCache = redisClient.get(RedisEnum.GROUP.getKey() + groupId);
             if(StringUtils.isEmpty(groupCache)){
-                continue;
+                // 缓存未命中时回查数据库并回填：直接写库导入的群没有 group: 缓存，
+                // 这里直接 continue 会让群成员接口能看到群、群列表却显示不出来
+                Group groupFromDb = groupService.getById(groupId);
+                if (groupFromDb == null) {
+                    continue;
+                }
+                groupCache = JSONObject.toJSONString(groupFromDb);
+                redisClient.set(RedisEnum.GROUP.getKey() + groupId, groupCache);
             }
             Group group = JSONObject.parseObject(groupCache, Group.class);
             GroupVO groupVO = new GroupVO();
@@ -167,8 +226,17 @@ public class ContactServiceImpl implements ContactService {
             return voList;
         }
         for (String botId : botIds) {
-            String botCache = redisUtil.get(RedisEnum.BOT.getKey() + botId);
+            String botCache = redisClient.get(RedisEnum.BOT.getKey() + botId);
             if(StringUtils.isEmpty(botCache)){
+                // 缓存未命中时回查数据库并回填：直接写库导入的机器人没有缓存，
+                // 这里直接 continue 会让“机器人 (N)”的数字和展开后的列表对不上
+                Bot bot = botService.getById(botId);
+                if (bot == null) {
+                    continue;
+                }
+                String botJson = JSONObject.toJSONString(bot);
+                redisClient.set(RedisEnum.BOT.getKey() + botId, botJson);
+                voList.add(JSONObject.parseObject(botJson, BotVO.class));
                 continue;
             }
             BotVO bot = JSONObject.parseObject(botCache, BotVO.class);
@@ -200,7 +268,7 @@ public class ContactServiceImpl implements ContactService {
             String receiverId = friendRequest.getReceiverId();
 
             // 从redis获取用户信息
-            String friendCache = redisUtil.get(RedisEnum.USER.getKey() + receiverId);
+            String friendCache = redisClient.get(RedisEnum.USER.getKey() + receiverId);
             if(StringUtils.isEmpty(friendCache)){
                 continue;
             }
@@ -248,7 +316,7 @@ public class ContactServiceImpl implements ContactService {
         for (FriendRequest friendRequest : receiverFriendReqList) {
             String senderId = friendRequest.getSenderId();
             // 从redis获取用户信息
-            String friendCache = redisUtil.get(RedisEnum.USER.getKey() + senderId);
+            String friendCache = redisClient.get(RedisEnum.USER.getKey() + senderId);
             if(StringUtils.isEmpty(friendCache)){
                 continue;
             }
@@ -270,5 +338,25 @@ public class ContactServiceImpl implements ContactService {
             voList.add(friendRequestVO);
         }
         return voList;
+    }
+
+    /**
+     * 撤回我发送且仍待处理的好友申请
+     * 只有发送者本人、且申请仍处于待处理状态时才允许撤回
+     * @param requestId 申请ID
+     * @return Boolean
+     */
+    @Override
+    public Boolean withdrawFriendRequest(String requestId) {
+        String userId = UserContext.get().getUserId();
+        FriendRequest request = friendRequestService.getById(requestId);
+        if (request == null || !userId.equals(request.getSenderId())) {
+            return false;
+        }
+        if (request.getFlowStatus() == null || request.getFlowStatus() != 0) {
+            return false;
+        }
+        // FriendRequest.delFlag 是逻辑删除字段，removeById 会走逻辑删除
+        return friendRequestService.removeById(requestId);
     }
 }

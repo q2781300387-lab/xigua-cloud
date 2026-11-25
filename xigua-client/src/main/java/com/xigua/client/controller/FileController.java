@@ -2,13 +2,11 @@ package com.xigua.client.controller;
 
 import com.xigua.common.core.exception.BusinessException;
 import com.xigua.domain.dto.MultipartFileDTO;
-import com.xigua.domain.result.R;
+import com.xigua.common.core.base.R;
 import com.xigua.api.service.FileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

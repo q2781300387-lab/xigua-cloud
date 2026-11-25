@@ -29,53 +29,30 @@ public class OpenAPIConfig {
                 .version("1.0.0"));
     }
 
-    // demo的swagger路由转发配置
     @Bean
-    public RouteLocator demoRoute(RouteLocatorBuilder builder) {
+    public RouteLocator swaggerRoute(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("demo-api", r -> r.path("/demo/v3/api-docs")
-                        .filters(f -> f.rewritePath("/demo/(?<segment>.*)", "/demo/${segment}"))
-                        .uri("http://127.0.0.1:8081"))
-                .build();
-    }
 
-    // client的swagger路由转发配置
-    @Bean
-    public RouteLocator clientRoute(RouteLocatorBuilder builder) {
-        return builder.routes()
                 .route("client-api", r -> r.path("/client/v3/api-docs")
                         .filters(f -> f.rewritePath("/client/(?<segment>.*)", "/client/${segment}"))
                         .uri("http://127.0.0.1:8084"))
-                .build();
-    }
 
-    // center的swagger路由转发配置
-    @Bean
-    public RouteLocator centerRoute(RouteLocatorBuilder builder) {
-        return builder.routes()
                 .route("center-api", r -> r.path("/center/v3/api-docs")
                         .filters(f -> f.rewritePath("/center/(?<segment>.*)", "/center/${segment}"))
                         .uri("http://127.0.0.1:8083"))
-                .build();
-    }
 
-    // sso的swagger路由转发配置
-    @Bean
-    public RouteLocator ssoRoute(RouteLocatorBuilder builder) {
-        return builder.routes()
-                .route("sso-api", r -> r.path("/sso/v3/api-docs")
-                        .filters(f -> f.rewritePath("/sso/(?<segment>.*)", "/sso/${segment}"))
-                        .uri("http://127.0.0.1:8082"))
-                .build();
-    }
-
-    // ai的swagger路由转发配置
-    @Bean
-    public RouteLocator aiRoute(RouteLocatorBuilder builder) {
-        return builder.routes()
                 .route("ai-api", r -> r.path("/ai/v3/api-docs")
                         .filters(f -> f.rewritePath("/ai/(?<segment>.*)", "/ai/${segment}"))
                         .uri("http://127.0.0.1:8085"))
+
+                .route("admin-api", r -> r.path("/admin/v3/api-docs")
+                        .filters(f -> f.rewritePath("/admin/(?<segment>.*)", "/admin/${segment}"))
+                        .uri("http://127.0.0.1:8086"))
+
+                .route("search-api", r -> r.path("/search/v3/api-docs")
+                        .filters(f -> f.rewritePath("/search/(?<segment>.*)", "/search/${segment}"))
+                        .uri("http://127.0.0.1:8087"))
+
                 .build();
     }
 }

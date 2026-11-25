@@ -17,6 +17,18 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- WebSocket 容器配置：放宽 20000 字符长消息的帧缓冲上限 -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-websocket</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-gateway -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -40,12 +52,6 @@
             <artifactId>spring-cloud-loadbalancer</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.dubbo</groupId>
-            <artifactId>dubbo-nacos-spring-boot-starter</artifactId>
-            <version>${dubbo.version}</version>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -65,30 +71,6 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
             <version>${bootstrap.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.xigua</groupId>
-            <artifactId>xigua-common-core</artifactId>
-            <version>${xigua.version}</version>
-            <!-- 排除redis相关依赖，也可以把redis单独抽出模块隔离  -->
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-data-redis</artifactId>
-                </exclusion>
-
-                <!-- redis 连接池  -->
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-pool2</artifactId>
-                </exclusion>
-
-                <exclusion>
-                    <groupId>com.xigua</groupId>
-                    <artifactId>xigua-common-mybatis</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>

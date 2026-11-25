@@ -6,13 +6,6 @@ spring:
           lowerCaseServiceId: true
           enabled: true
       routes:
-        - id: demo-test
-          uri: lb://demo-test
-          predicates:
-            - Path=/demo/**
-          filters:
-            - StripPrefix=1
-
         - id: xigua-client
           uri: lb://xigua-client
           predicates:
@@ -27,18 +20,24 @@ spring:
           filters:
             - StripPrefix=1
 
-
-        - id: xigua-sso
-          uri: lb://xigua-sso
-          predicates:
-            - Path=/sso/**
-          filters:
-            - StripPrefix=1
-
         - id: xigua-ai
           uri: lb://xigua-ai
           predicates:
             - Path=/ai/**
+          filters:
+            - StripPrefix=1
+
+        - id: xigua-admin
+          uri: lb://xigua-admin
+          predicates:
+            - Path=/admin/**
+          filters:
+            - StripPrefix=1
+
+        - id: xigua-search
+          uri: lb://xigua-search
+          predicates:
+            - Path=/search/**
           filters:
             - StripPrefix=1
 
@@ -48,13 +47,13 @@ springdoc:
     prefix:
   swagger-ui:
     urls:
-      - name: demo-api
-        url: /demo/v3/api-docs
       - name: client-api
         url: /client/v3/api-docs
       - name: center-api
         url: /center/v3/api-docs
-      - name: sso-api
-        url: /sso/v3/api-docs
       - name: ai-api
         url: /ai/v3/api-docs
+      - name: admin-api
+        url: /admin/v3/api-docs
+      - name: search-api
+        url: /search/v3/api-docs

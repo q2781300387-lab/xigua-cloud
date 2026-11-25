@@ -28,6 +28,12 @@ public class Bot implements Serializable {
     private String id;
 
     /**
+     * 用户id
+     */
+    @Schema(description = "用户id")
+    private String userId;
+
+    /**
      * 名称
      */
     @Schema(description = "名称")

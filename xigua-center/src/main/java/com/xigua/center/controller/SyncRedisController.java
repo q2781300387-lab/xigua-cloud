@@ -1,7 +1,7 @@
 package com.xigua.center.controller;
 
 import com.xigua.api.service.SyncRedisService;
-import com.xigua.domain.result.R;
+import com.xigua.common.core.base.R;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.collections4.CollectionUtils;

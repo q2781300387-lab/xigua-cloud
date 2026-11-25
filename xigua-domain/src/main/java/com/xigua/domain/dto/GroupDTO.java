@@ -17,12 +17,12 @@ import java.util.List;
 public class GroupDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Schema(name = "groupId", description = "群组id")
+    @Schema(description = "群组id")
     private String groupId;
 
-    @Schema(name = "groupAvatar", description = "群组头像")
+    @Schema(description = "群组头像")
     private String groupAvatar;
 
-    @Schema(name = "memberIds", description = "群成员")
+    @Schema(description = "群成员")
     private List<String> memberIds;
 }

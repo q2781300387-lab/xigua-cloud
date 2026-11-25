@@ -3,11 +3,11 @@ package com.xigua.ai.agent;
 import com.alibaba.fastjson2.JSONObject;
 import com.xigua.ai.agent.model.AgentContext;
 import com.xigua.ai.llm.model.ChatContext;
-import com.xigua.ai.enums.Prompt;
-import com.xigua.ai.intent.IntentRecognizer;
-import com.xigua.ai.intent.IntentType;
+import com.xigua.ai.domain.enums.Prompt;
+import com.xigua.ai.helper.IntentRecognizer;
+import com.xigua.ai.helper.IntentType;
 import com.xigua.ai.llm.LLMService;
-import com.xigua.ai.sse.StreamCallback;
+import com.xigua.ai.llm.model.Memory;
 import com.xigua.ai.tool.ToolDispatcher;
 import com.xigua.ai.tool.ToolSelector;
 import com.xigua.ai.tool.ToolType;
@@ -16,14 +16,14 @@ import com.xigua.ai.tool.model.ToolRequest;
 import com.xigua.ai.tool.model.ToolResult;
 import com.xigua.ai.tool.model.ToolSelectionResult;
 import com.xigua.ai.utils.PromptUtil;
-import com.xigua.common.core.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,18 +45,21 @@ public class SimpleAgent implements Agent {
     private ToolSelector toolSelector;
 
     @Override
-    public Flux<String> process(AgentContext agentContext) {
-        Flux<String> result = Flux.empty();
+    public Flux<ServerSentEvent<String>> process(AgentContext agentContext) {
         String requestId = agentContext.getRequestId();
         Boolean stream = agentContext.getStream();
         String input = agentContext.getInput();
+        List<Memory> memory = agentContext.getMemory();
+
+        // 推送状态：正在识别意图
+        Flux<ServerSentEvent<String>> result = Flux.just(sseStatus("正在识别意图..."));
 
         IntentType intentType = intentRecognizer.detect(input);
         log.info("agentProcess requestId: {}，意图: {}", requestId, intentType);
 
         switch (intentType) {
             case UNKNOWN:
-                return Flux.just("未知意图");
+                return Flux.concat(result, Flux.just(sseMessage("未知意图")));
             case TEXT_TO_TEXT:
                 String systemPrompt = agentContext.getSystemPrompt();
                 if(StringUtils.isEmpty(systemPrompt)) {
@@ -65,11 +68,13 @@ public class SimpleAgent implements Agent {
                 ChatContext chatContext = ChatContext.builder()
                         .prompt(systemPrompt)
                         .input(input)
+                        .memory(memory)
                         .stream(stream)
+                        .model(agentContext.getModel())
                         .build();
                 try {
                     log.info("agentProcess ai对话开始 requestId: {}，调用模型入参: {}", requestId, chatContext);
-                    result = llmService.chat(chatContext);
+                    result = Flux.concat(result, toMessageFlux(llmService.chat(chatContext)));
                     log.info("agentProcess ai对话结束 requestId: {}，调用模型结束", requestId);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -80,8 +85,11 @@ public class SimpleAgent implements Agent {
                 ToolSelectionResult toolSelectionResult = toolSelector.selectTool(input);
                 log.info("agentProcess requestId: {}，工具选择结果: {}", requestId, toolSelectionResult);
                 if(toolSelectionResult == null){
-                    return Flux.just("未选择到合适的工具");
+                    return Flux.concat(result, Flux.just(sseMessage("未选择到合适的工具")));
                 }
+
+                // 推送状态：正在调用工具
+                result = Flux.concat(result, Flux.just(sseStatus("正在调用工具: " + toolSelectionResult.getToolType().getDescription() + "...")));
 
                 // 调用工具
                 ToolCall toolCall = ToolCall.builder()
@@ -96,39 +104,47 @@ public class SimpleAgent implements Agent {
 
                 // tool调用结果 再根据llm推理处理一下
                 log.info("agentProcess requestId: {}，大模型推理处理工具调用结果", requestId);
-                Flux<String> refinedOutput = refineOutput(input, stream, toolResult);
-                result = refinedOutput;
+                result = Flux.concat(result, Flux.just(sseStatus("正在生成回答...")));
+                Map<String, Object> params = Map.<String, Object>of(
+                        "user_input", input,
+                        "tool_name", toolResult.getToolName(),
+                        "tool_output", JSONObject.toJSONString(toolResult.getData()),
+                        "stream", stream
+                );
+                ToolCall refineCall = ToolCall.builder()
+                        .toolName(ToolType.REFINE.getName())
+                        .request(ToolRequest.builder()
+                                .params(params)
+                                .build())
+                        .build();
+                ToolResult refineResult = toolDispatcher.dispatch(refineCall);
+                result = Flux.concat(result, Flux.just(sseMessage(refineResult.getOutput())));
                 break;
             default:
-                return Flux.just("未知意图");
+                return Flux.concat(result, Flux.just(sseMessage("未知意图")));
         }
 
         return result;
     }
 
-    private Flux<String> refineOutput(String input, Boolean stream, ToolResult toolResult){
-        Flux<String> refinedOutput = Flux.empty();
-        String prompt = PromptUtil.getPrompt(Prompt.REFINE);
-        prompt = PromptUtil.fill(prompt, Map.of(
-                "user_input", input,
-                "tool_name", toolResult.getToolName(),
-                "tool_output", JSONObject.toJSONString(toolResult.getData())
-        ));
+    /**
+     * 构建状态类型的 SSE 事件
+     */
+    private ServerSentEvent<String> sseStatus(String data) {
+        return ServerSentEvent.<String>builder().event("status").data(data).build();
+    }
 
-        String refineInput = "这是工具调用后的结果，请根据它为用户生成自然语言回答：\n" + JSONObject.toJSONString(toolResult.getData());
+    /**
+     * 构建消息类型的 SSE 事件
+     */
+    private ServerSentEvent<String> sseMessage(String data) {
+        return ServerSentEvent.<String>builder().event("message").data(data).build();
+    }
 
-        // 调用模型
-        ChatContext chatContext = ChatContext.builder()
-                .prompt(prompt)
-                .input(refineInput)
-                .stream(stream)
-                .build();
-        try {
-            refinedOutput = llmService.chat(chatContext);
-        } catch (Exception e) {
-            log.error("调用模型失败, input: {}", input, e);
-            throw new BusinessException("调用模型失败");
-        }
-        return refinedOutput;
+    /**
+     * 将 Flux<String> 中每个元素包装为 message 类型的 SSE 事件
+     */
+    private Flux<ServerSentEvent<String>> toMessageFlux(Flux<String> flux) {
+        return flux.map(chunk -> ServerSentEvent.<String>builder().event("message").data(chunk).build());
     }
 }

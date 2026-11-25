@@ -5,6 +5,8 @@ import com.xigua.domain.dto.RegisterUserDTO;
 import com.xigua.domain.entity.User;
 import com.xigua.domain.vo.LoginVO;
 
+import java.util.Map;
+
 /**
  * @ClassName AuthService
  * @Description TODO
@@ -29,6 +31,19 @@ public interface AuthService {
      * @return Boolean
      */
     LoginVO login(LoginDTO loginDTO);
+
+    /**
+     * 登出
+     * @author wangjinfei
+     * @date 2026/1/4 20:10
+     * @param userId
+    */
+    void logout(String userId);
+
+    /**
+     * 只登出当前设备，其他端会话继续有效
+     */
+    void logoutCurrent(String userId, String token);
 
     /**
      * 创建token
@@ -56,4 +71,14 @@ public interface AuthService {
      * @return String
     */
     String redeemToken(String ticket);
+
+    /**
+     * 查询当前用户名/IP 的登录失败次数，判断是否需要验证码
+     */
+    Map<String, Object> loginRisk(String username);
+
+    /**
+     * 生成一次性算术验证码
+     */
+    Map<String, Object> captcha(String username);
 }

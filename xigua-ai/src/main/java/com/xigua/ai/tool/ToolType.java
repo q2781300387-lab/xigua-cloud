@@ -8,6 +8,7 @@ import lombok.ToString;
 public enum ToolType {
     WEATHER("weather", "获取天气信息"),
     WEB_SEARCH("web_search", "网络搜索"),
+    REFINE("refine", "优化工具调用结果"),
     ;
 
     private final String name;

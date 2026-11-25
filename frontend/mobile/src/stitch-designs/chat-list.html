@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Messages</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+              "outline": "#7e7667",
+              "on-surface": "#1e1b13",
+              "surface-container-low": "#f8f9fa",
+              "surface-tint": "#32abfd",
+              "outline-variant": "#e5e7eb",
+              "surface-container": "#f3f4f6",
+              "on-primary": "#ffffff",
+              "primary-container": "#32abfd",
+              "background": "#ffffff",
+              "on-background": "#1e1b13",
+              "secondary": "#5d5e61",
+              "surface": "#ffffff",
+              "primary": "#32abfd",
+              "surface-container-highest": "#f3f4f6",
+              "surface-variant": "#f3f4f6",
+              "accent-blue": "#32abfd",
+              "accent-blue-container": "#75c6fe"
+            },
+            "borderRadius": {
+              "DEFAULT": "1rem",
+              "lg": "1.5rem",
+              "xl": "2rem",
+              "full": "9999px"
+            },
+            "fontFamily": {
+              "headline": ["Manrope", "Plus Jakarta Sans"],
+              "body": ["Plus Jakarta Sans"],
+              "label": ["Plus Jakarta Sans"]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { background-color: #ffffff; }
+    </style>
+</head>
+<body class="font-body text-on-surface antialiased bg-white">
+<!-- TopAppBar from COMPONENTS_19 edit -->
+<header class="fixed top-0 w-full z-50 bg-white/70 dark:bg-stone-900/70 backdrop-blur-xl">
+<div class="flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-50 shadow-sm hover:bg-stone-200/50 dark:hover:bg-stone-800/50 transition-colors active:scale-95 duration-200 cursor-pointer">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJD-B6PczqaQ4uygJqwfjLRjXLrPn5rijbmOXPCRpod2DSYwKvL_fEqlBgJHtfxdqGDtqN3RXtOp3PFnyQV_XMx-h4RtHcMUt0AjGf6mucb3aia6-p2LebTEUfhJuv1dbemAafvH2Xxq_9qhtb0TLJ5uPBShHR4PGoFcOZ9DrRRu_3SjHLMCTiqEfRdBeHac2nmHNP0MJmnLvtDObv49vovHRA-7spo9GtGBnHT1dEO2M_uxLk518aHHM0RZwwKg3Y8bQ_7qBv1Cc"/>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-[#32abfd] dark:text-[#75c6fe] hover:bg-stone-200/50 dark:hover:bg-stone-800/50 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined">search</span>
+</button>
+</div>
+</header>
+<main class="pt-24 pb-32 px-4 max-w-md mx-auto">
+<!-- Search Section -->
+<div class="mb-6">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-4 text-gray-400">search</span>
+<input class="w-full h-12 bg-gray-100 border-none rounded-2xl pl-12 pr-4 text-body-md focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-gray-400" placeholder="搜索消息或联系人" type="text"/>
+</div>
+</div>
+<!-- Chat List - Clean Card Layout -->
+<div class="space-y-3">
+<!-- Chat Card 1 -->
+<div class="bg-white dark:bg-stone-800 p-4 flex items-center gap-4 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 hover:bg-gray-50/50 transition-colors cursor-pointer active:scale-[0.98] duration-200">
+<div class="relative w-14 h-14 shrink-0">
+<img alt="Bunny" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPZJ2RHXpjlcQ8uOyvBeimu3wVcw6y4ba6dJ4QGFmoQgdu6qFj88vFPq4Ki6JTETC6z1z16wBzJAL81_5_JXoeoTlYSIxnozPqFYu2L1as4uFCXSvFBOlzuA9S6CEVDCAM0W9iC4GpdfDFmIjt7Aw6a1GnnMZOetazVSJfPBLtJyJzEF6qtXvMQwVyHVkPJRuNilakSqqFH08Lsamyy9Xv6l2VPlLEMubC_KWfYBXXSKi5e4jZKNdDkXU5xHhwUd1pjg877r_MMqQ"/>
+<div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-center mb-0.5">
+<span class="text-base font-bold text-on-surface truncate">Bunny</span>
+<span class="text-[11px] text-gray-500 font-medium">12:30</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-sm text-on-surface/60 truncate pr-4">Hello! 这里的项目进展如何了？</p>
+<span class="bg-[#32abfd] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">3</span>
+</div>
+</div>
+</div>
+<!-- Chat Card 2 -->
+<div class="bg-white dark:bg-stone-800 p-4 flex items-center gap-4 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 hover:bg-gray-50/50 transition-colors cursor-pointer active:scale-[0.98] duration-200">
+<div class="w-14 h-14 shrink-0 overflow-hidden">
+<img alt="Alex" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvPtz-8gOe9EzpwB-E-gWKcq6yX5czO57QYPHncr9Ol_ed3IAYitccRGH9BxgcJHr-vkiTlysP9mujDuK8C5aaNKHyknnJbF-Y2t9aXXGHCHtj9Qb-2rYZFX2pgE5FD80Nez5sV1dLp7vYJRgVSuGQR8yO1rNpWr4XisYc-i6ljLeKjhzeYnQwTssOIDskbbR_CntlcUVM0SHnhKlnfibHBkQZCbrtW-bc7GsRQ64vmUKh2wCJdFEHEAPafE62xBme0OuwKJ7Oyyw"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-center mb-0.5">
+<span class="text-base font-bold text-on-surface truncate">Alex Chen</span>
+<span class="text-[11px] text-gray-500 font-medium">11:45</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-sm text-on-surface/60 truncate pr-4">好的，我会尽快确认那份合同。</p>
+</div>
+</div>
+</div>
+<!-- Chat Card 3 -->
+<div class="bg-white dark:bg-stone-800 p-4 flex items-center gap-4 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 hover:bg-gray-50/50 transition-colors cursor-pointer active:scale-[0.98] duration-200">
+<div class="w-14 h-14 shrink-0">
+<img alt="Team Design" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMnV-KdTSBAiHorAKo0FJGjhp8aUEC-o8f9LFKCjbyRVgQpApTh-CERxBrnFkYtxpV52LiJRksNppkwOevg5o2p3HSxdeUf_wQLtq9Cn6LAvQK14UhFkWpQN9PClYRBl2X7w7yjfUgTH-akvUY-V8ZLT8Di9hbCJk-mHvvB55qITzgzO51tFqwBnsqd3WTR6cBuF9TeXCP8NjIDHzRmTZCpSzSkcyEIlRAvuDesrWojlZBaqdwKmMl52Ir_sVQDelpRoKOOD0LaTA"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-center mb-0.5">
+<span class="text-base font-bold text-on-surface truncate">设计团队</span>
+<span class="text-[11px] text-gray-500 font-medium">10:12</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-sm text-on-surface/60 truncate pr-4">Sarah: 新的UI组件库已经更新了...</p>
+<span class="bg-[#32abfd] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">12</span>
+</div>
+</div>
+</div>
+<!-- Chat Card 4 -->
+<div class="bg-white dark:bg-stone-800 p-4 flex items-center gap-4 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 hover:bg-gray-50/50 transition-colors cursor-pointer active:scale-[0.98] duration-200">
+<div class="w-14 h-14 shrink-0 bg-[#32abfd]/10 flex items-center justify-center rounded-full text-[#32abfd]">
+<span class="material-symbols-outlined text-3xl">groups</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-center mb-0.5">
+<span class="text-base font-bold text-on-surface truncate">Family Trip 2024</span>
+<span class="text-[11px] text-gray-500 font-medium">昨天</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-sm text-on-surface/60 truncate pr-4">Mike: [图片]</p>
+</div>
+</div>
+</div>
+<!-- Chat Card 5 -->
+<div class="bg-white dark:bg-stone-800 p-4 flex items-center gap-4 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 hover:bg-gray-50/50 transition-colors cursor-pointer active:scale-[0.98] duration-200">
+<div class="w-14 h-14 shrink-0 opacity-80">
+<img alt="Old Friend" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHjsTFCx4j8sfSjgj--52dSq8F4rRObFTEfD-R2HNfuTqeuwlKVUQx-tzjaGLTMuyE5ppsUf1W44OuyMlrd-w5ewkarFfbCdqcIpANu9Wgk4whEBaoDhWsx4avj0AAVxLtE9pvImRlQUWcv2GgiR_LbQfKKdc3bUxel7DkEwO1zh7hm-VFRib-c8FQcdxK2k3_1jqKJxa_eDIydusVaQ_xl1FS2uOJgYVHx-Kk8vbipItBD1FiOnBhT1-4rjFBldOs420wuCzda_M"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-center mb-0.5">
+<span class="text-base font-bold text-on-surface/80 truncate">李教授</span>
+<span class="text-[11px] text-gray-500 font-medium">星期三</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-sm text-on-surface/50 truncate pr-4">下次讲座的主题已经确定了。</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar from COMPONENTS_19 -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-white z-50 rounded-t-3xl shadow-[0px_-4px_20px_rgba(30,27,19,0.04)]">
+<!-- Navigation Item 1: 聊天 (Active) -->
+<a class="flex flex-col items-center justify-center text-[#32ABFD] transition-all duration-300 ease-out tap-highlight-none px-4 py-1" href="#">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+</svg>
+<span class="font-['Plus_Jakarta_Sans'] text-xs font-semibold">聊天</span>
+</a>
+<!-- Navigation Item 2: 通讯录 -->
+<a class="flex flex-col items-center justify-center text-[#1e1b13]/40 transition-all duration-300 ease-out tap-highlight-none hover:bg-[#f5eddf]/50 rounded-xl px-4 py-1" href="#">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+<span class="font-['Plus_Jakarta_Sans'] text-xs font-semibold">通讯录</span>
+</a>
+<!-- Navigation Item 3: 通知 -->
+<a class="flex flex-col items-center justify-center text-[#1e1b13]/40 transition-all duration-300 ease-out tap-highlight-none hover:bg-[#f5eddf]/50 rounded-xl px-4 py-1" href="#">
+<div class="relative">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+<div class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#75c6fe] rounded-full ring-2 ring-white"></div>
+</div>
+<span class="font-['Plus_Jakarta_Sans'] text-xs font-semibold">通知</span>
+</a>
+<!-- Navigation Item 4: 我 -->
+<a class="flex flex-col items-center justify-center text-[#1e1b13]/40 transition-all duration-300 ease-out tap-highlight-none hover:bg-[#f5eddf]/50 rounded-xl px-4 py-1" href="#">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+<span class="font-['Plus_Jakarta_Sans'] text-xs font-semibold">我</span>
+</a>
+</nav>
+</body></html>

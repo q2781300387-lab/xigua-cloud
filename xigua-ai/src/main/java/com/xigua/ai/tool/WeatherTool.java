@@ -2,14 +2,22 @@ package com.xigua.ai.tool;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.xigua.ai.tool.dto.GetWeatherRes;
 import com.xigua.ai.tool.model.ToolRequest;
 import com.xigua.ai.tool.model.ToolResult;
 import com.xigua.common.core.util.BeanUtil;
-import com.xigua.domain.thirdparty.GetWeatherRes;
+import com.xigua.common.redis.client.RedisClient;
+import com.xigua.domain.enums.RedisEnum;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 /**
  * @ClassName WeatherTool
@@ -24,6 +32,9 @@ public class WeatherTool implements AITool {
     private final String url = "http://apis.juhe.cn/simpleWeather/query";
     @Value("${tool.weather.key}")
     private String key;
+
+    @Autowired
+    private RedisClient redisClient;
 
     @Override
     public String name() {
@@ -46,7 +57,14 @@ public class WeatherTool implements AITool {
     public GetWeatherRes getWeather(String city) {
         GetWeatherRes getWeatherRes = new GetWeatherRes();
 
-        // todo 从缓存中获取结果
+        // 从缓存中获取结果
+        String cacheKey = RedisEnum.WEATHER_CITY.getKey() + city;
+        String cacheValue = redisClient.get(cacheKey);
+        if (StringUtils.isNotEmpty(cacheValue)) {
+            getWeatherRes = JSONObject.parseObject(cacheValue, GetWeatherRes.class);
+            return getWeatherRes;
+        }
+
 
         HttpUrl url = HttpUrl.parse(this.url).newBuilder()
                 .addQueryParameter("key", this.key)
@@ -83,7 +101,11 @@ public class WeatherTool implements AITool {
             String result = jsonObject.getJSONObject("result").getString("realtime");
             getWeatherRes = JSONObject.parseObject(result, GetWeatherRes.class);
 
-            // todo 缓存结果
+            // 缓存结果
+            LocalDateTime toDayLatestTime = LocalDate.now().atTime(23, 59, 59);
+            long second = ChronoUnit.SECONDS.between(LocalDateTime.now(), toDayLatestTime);
+            // 缓存有效期为当天23:59:59
+            redisClient.set(RedisEnum.WEATHER_CITY.getKey() + city, result, second);
 
             return getWeatherRes;
         }catch (Exception e) {

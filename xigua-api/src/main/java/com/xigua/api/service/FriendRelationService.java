@@ -1,11 +1,9 @@
 package com.xigua.api.service;
 
 import com.xigua.domain.dto.FriendVerifyDTO;
-import com.xigua.domain.dto.sendFriendRequestDTO;
+import com.xigua.domain.dto.SendFriendRequestDTO;
 import com.xigua.domain.entity.User;
 import com.xigua.domain.vo.FriendDetailVO;
-import com.xigua.domain.vo.FriendVO;
-import com.xigua.domain.vo.FriendRequestVO;
 
 import java.util.List;
 
@@ -23,7 +21,7 @@ public interface FriendRelationService {
      * @param dto
      * @return Boolean
      */
-    Boolean sendFriendRequest(sendFriendRequestDTO dto);
+    Boolean sendFriendRequest(SendFriendRequestDTO dto);
 
     /**
      * 好友验证

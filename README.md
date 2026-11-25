@@ -1,3 +1,28 @@
+# 西瓜 IM · 三端一体仓库
+
+本仓库同时保存 IM 的后端、PC Web、手机 H5 与三端共享核心。
+
+## 目录
+
+- 根目录：`xigua-cloud` 后端（Spring Cloud Alibaba 微服务）
+- `frontend/pc`：PC Web（Vue 3 + Vite）
+- `frontend/mobile`：手机 H5（uni-app）
+- `frontend/shared-core`：PC 与手机共用的请求 / API / WebSocket 核心
+
+## 本次收口内容
+
+- 已退群会话：PC 与手机空态 + 从会话列表移除；后端 `getLastMes` 双层过滤并清理 Redis 残留
+- PC ↔ 手机真实收发回归：文字、图片、文件、语音、双向视频通话
+- 图片 502 修复：前端机 MinIO 9000 隧道
+- 手机文件标题截断修复：剥离上传服务雪花 ID 前缀
+- 文件上传新增扩展名 + Content-Type + 魔数三重校验
+- P2 SQL 索引幂等化
+
+## 注意
+
+仓库内 `nacos/*.yaml` 的密码、对象存储密钥已替换为 `CHANGE_ME`，部署前请按实际环境注入，不要提交真实凭据。
+
+---
 # 🍉Xigua-Cloud 项目介绍
 
 📄 开源协议

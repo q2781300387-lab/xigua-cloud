@@ -1,14 +1,12 @@
 package com.xigua.ai.utils;
 
-import com.xigua.ai.enums.Prompt;
+import com.xigua.ai.domain.enums.Prompt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
 
 /**

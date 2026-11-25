@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xigua.ai.mapper.AiMessageMapper">
+
+    <select id="lastMessages" resultType="com.xigua.domain.entity.AiMessage">
+        SELECT id, session_id, role, content, tokens,
+               create_time, update_time
+        FROM xg_ai_message
+        WHERE session_id = #{sessionId}
+          AND role IN ('user', 'assistant')
+          AND del_flag = 0
+        ORDER BY create_time desc
+            LIMIT #{size}
+    </select>
+    <select id="pageMessages" resultType="com.xigua.domain.vo.AiHistoryMessageVO">
+        SELECT id AS messageId,
+               role,
+               content,
+               UNIX_TIMESTAMP(create_time) * 1000 AS timestamp
+        FROM xg_ai_message
+        WHERE del_flag = 0
+          AND session_id = #{query.sessionId}
+          AND role IN ('user', 'assistant')
+        ORDER BY create_time desc
+    </select>
+</mapper>

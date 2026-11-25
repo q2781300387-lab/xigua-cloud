@@ -4,7 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.xigua.api.service.CenterService;
 import com.xigua.api.service.MessageReadService;
 import com.xigua.common.core.util.DateUtil;
-import com.xigua.common.core.util.RedisUtil;
+import com.xigua.common.redis.client.RedisClient;
 import com.xigua.domain.connect.Client;
 import com.xigua.domain.enums.*;
 import com.xigua.domain.ws.MessageRequest;
@@ -28,11 +28,11 @@ public class PrivateReadChatMessageService extends AbstractReadChatMessageServic
     @Autowired
     private CenterService centerService;
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
 
     @Override
     protected ChatType getChatType() {
-        return ChatType.ONE;
+        return ChatType.PRIVATE;
     }
 
     /**
@@ -46,24 +46,19 @@ public class PrivateReadChatMessageService extends AbstractReadChatMessageServic
         String senderId = messageRequest.getSenderId();
         String receiverId = messageRequest.getReceiverId();
 
-        String userInServer = centerService.onlineUser(receiverId);
-        if(StringUtils.isEmpty(userInServer)){
+        Client client = centerService.onlineUser(receiverId);
+        if(client == null){
             return;
         }
 
         // 获取接收人打开的聊天窗口好友是谁
-        String receiverActiveFriend = redisUtil.get(RedisEnum.CURRENT_CHAT_WINDOW.getKey() + receiverId);
+        String receiverActiveFriend = redisClient.get(RedisEnum.CURRENT_CHAT_WINDOW.getKey() + receiverId);
         if(StringUtils.isEmpty(receiverActiveFriend)){
             return;
         }
 
         // 接收人打开的聊天窗口好友是发送人，发送已读通知  （对方在线 && 对方打开的聊天框是发送人）
         if(receiverActiveFriend.equals(senderId)){
-            // 获取发送人所在的节点信息
-            String key = RedisEnum.CLIENT_CONNECT_CENTER.getKey() +
-                    userInServer.split(":")[1] + ":" + userInServer.split(":")[2];
-            String value = redisUtil.get(key);
-            Client client = JSONObject.parseObject(value, Client.class);
 
             // 系统推送已读通知
             MessageResponse messageResponse = new MessageResponse();
@@ -90,10 +85,17 @@ public class PrivateReadChatMessageService extends AbstractReadChatMessageServic
         String receiverId = messageRequest.getReceiverId();
         String friendUnreadCountKey = RedisEnum.FRIEND_UNREAD_COUNT.getKey() + senderId;
 
-        /**
-         * todo 点开聊天框，清零，可以根据已读数据逐次 - 1
-         * 暂时直接清零
-         */
-        redisUtil.hashPut(friendUnreadCountKey, receiverId, 0);
+        // 获取当前未读数（扣减前）
+        Object unreadObj = redisClient.hashGet(friendUnreadCountKey, receiverId);
+        Long currentUnread = unreadObj instanceof Number ? ((Number) unreadObj).longValue() : null;
+
+        // 清零好友未读数
+        redisClient.hashPut(friendUnreadCountKey, receiverId, 0);
+
+        // 扣减总未读数
+        if (currentUnread != null && currentUnread > 0) {
+            String chatUnreadCountKey = RedisEnum.CHAT_UNREAD_COUNT.getKey() + senderId;
+            redisClient.incrby(chatUnreadCountKey, -currentUnread);
+        }
     }
 }

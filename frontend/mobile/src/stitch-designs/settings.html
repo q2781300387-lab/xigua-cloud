@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Manrope:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#32abfd",
+                    "background": "#ffffff",
+                    "on-surface": "#1e1b13",
+                    "on-surface-variant": "#4c4639",
+                    "outline-variant": "#d4c8b9",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Plus Jakarta Sans"],
+                    "label": ["Plus Jakarta Sans"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tap-highlight-none {
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen antialiased">
+<!-- Top Header -->
+<header class="sticky top-0 w-full z-50 bg-white/70 backdrop-blur-xl flex items-center justify-center h-16">
+<h1 class="font-headline font-bold text-xl text-on-surface">设置</h1>
+</header>
+<main class="pt-4 pb-20 px-5 max-w-md mx-auto">
+<div class="space-y-4">
+<!-- Section 1 -->
+<div class="bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-gray-50 overflow-hidden">
+<!-- Account & Security -->
+<button class="w-full flex items-center px-6 py-5 border-b border-gray-50 hover:bg-gray-50 transition-colors tap-highlight-none group">
+<div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mr-4 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">shield</span>
+</div>
+<span class="flex-1 text-left text-[16px] font-semibold text-on-surface">账号与安全</span>
+<span class="material-symbols-outlined text-outline-variant text-[20px] group-hover:translate-x-1 transition-transform">chevron_right</span>
+</button>
+<!-- Notifications -->
+<button class="w-full flex items-center px-6 py-5 border-b border-gray-50 hover:bg-gray-50 transition-colors tap-highlight-none group">
+<div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mr-4 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">notifications</span>
+</div>
+<span class="flex-1 text-left text-[16px] font-semibold text-on-surface">消息通知</span>
+<span class="material-symbols-outlined text-outline-variant text-[20px] group-hover:translate-x-1 transition-transform">chevron_right</span>
+</button>
+<!-- Privacy -->
+<button class="w-full flex items-center px-6 py-5 hover:bg-gray-50 transition-colors tap-highlight-none group">
+<div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mr-4 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<span class="flex-1 text-left text-[16px] font-semibold text-on-surface">隐私</span>
+<span class="material-symbols-outlined text-outline-variant text-[20px] group-hover:translate-x-1 transition-transform">chevron_right</span>
+</button>
+</div>
+<!-- Section 2 -->
+<div class="bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-gray-50 overflow-hidden">
+<!-- General -->
+<button class="w-full flex items-center px-6 py-5 border-b border-gray-50 hover:bg-gray-50 transition-colors tap-highlight-none group">
+<div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mr-4 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">settings</span>
+</div>
+<span class="flex-1 text-left text-[16px] font-semibold text-on-surface">通用</span>
+<span class="material-symbols-outlined text-outline-variant text-[20px] group-hover:translate-x-1 transition-transform">chevron_right</span>
+</button>
+<!-- Help & Feedback -->
+<button class="w-full flex items-center px-6 py-5 border-b border-gray-50 hover:bg-gray-50 transition-colors tap-highlight-none group">
+<div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mr-4 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">help</span>
+</div>
+<span class="flex-1 text-left text-[16px] font-semibold text-on-surface">帮助与反馈</span>
+<span class="material-symbols-outlined text-outline-variant text-[20px] group-hover:translate-x-1 transition-transform">chevron_right</span>
+</button>
+<!-- About -->
+<button class="w-full flex items-center px-6 py-5 hover:bg-gray-50 transition-colors tap-highlight-none group">
+<div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mr-4 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">info</span>
+</div>
+<span class="flex-1 text-left text-[16px] font-semibold text-on-surface">关于</span>
+<span class="material-symbols-outlined text-outline-variant text-[20px] group-hover:translate-x-1 transition-transform">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Logout Action -->
+<div class="mt-12">
+<button class="w-full py-4 bg-white border border-red-50 text-error font-body font-bold rounded-2xl hover:bg-red-50/50 active:scale-[0.98] transition-all duration-200 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+                退出登录
+            </button>
+</div>
+</main>
+</body></html>

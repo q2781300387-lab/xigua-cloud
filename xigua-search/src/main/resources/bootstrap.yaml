@@ -1,0 +1,34 @@
+# Tomcat
+server:
+  port: 8087
+
+# Windows Redis INFO 的 config_file 路径会触发 Properties \u 解析异常，
+# search 本身不依赖 Redis 健康检查，关闭该指标即可正常启动
+management:
+  health:
+    redis:
+      enabled: false
+
+# Spring
+spring:
+  application:
+    # 应用名称
+    name: xigua-search
+
+  # 环境配置
+  profiles:
+    active: @profiles.active@
+  cloud:
+    nacos:
+      server-addr: @nacos.server@
+      username: @nacos.username@
+      password: @nacos.password@
+      discovery:
+        namespace: xigua
+      config:
+        namespace: xigua
+        # 配置文件格式
+        file-extension: yaml
+        # 共享配置
+        shared-configs:
+          - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}

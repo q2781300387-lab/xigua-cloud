@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.xigua</groupId>
+        <artifactId>xigua-cloud</artifactId>
+        <version>1.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.xigua</groupId>
+    <artifactId>xigua-search</artifactId>
+    <name>xigua-search</name>
+    <description>xigua-search 搜索服务，封装 Elasticsearch 检索能力，后续支持向量检索</description>
+    <dependencies>
+        <!-- search 只读写 Elasticsearch，不需要数据库，排除 xigua-domain 传递引入的
+             xigua-common-mybatis（mybatis-plus-boot-starter/druid/mysql-connector-j），
+             避免强制要求配置 spring.datasource -->
+        <dependency>
+            <groupId>com.xigua</groupId>
+            <artifactId>xigua-api</artifactId>
+            <version>${xigua.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.xigua</groupId>
+                    <artifactId>xigua-common-mybatis</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.xigua</groupId>
+            <artifactId>xigua-common-core</artifactId>
+            <version>${xigua.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.xigua</groupId>
+            <artifactId>xigua-common-dubbo</artifactId>
+            <version>${xigua.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.xigua</groupId>
+            <artifactId>xigua-common-es</artifactId>
+            <version>${xigua.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.alibaba.cloud/spring-cloud-starter-alibaba-nacos-discovery -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${openapi.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-bootstrap -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+            <version>${bootstrap.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- GroupMemberService 继承 mybatis-plus 的 IService，search 只调用 getGroupRole，
+             因此仅补 extension 依赖，不引入 starter / 数据源 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-core</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-extension</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+        <!-- 3.5.9 起分页插件拆到 jsqlparser 模块，MybatisPlusConfig 初始化需要 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-jsqlparser-4.9</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+
+        <!-- GroupMemberService/UserService 的公共方法签名引用了 PagePlus，
+             这里只补类定义，排除会强制数据源自动装配的 starter 与驱动 -->
+        <dependency>
+            <groupId>com.xigua</groupId>
+            <artifactId>xigua-common-mybatis</artifactId>
+            <version>${xigua.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.mysql</groupId>
+                    <artifactId>mysql-connector-j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.alibaba</groupId>
+                    <artifactId>druid-spring-boot-3-starter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mybatis.spring.boot</groupId>
+                    <artifactId>mybatis-spring-boot-starter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.baomidou</groupId>
+                    <artifactId>mybatis-plus-boot-starter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.baomidou</groupId>
+                    <artifactId>mybatis-plus-jsqlparser-4.9</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+</project>

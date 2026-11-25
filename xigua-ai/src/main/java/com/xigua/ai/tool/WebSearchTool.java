@@ -82,7 +82,8 @@ public class WebSearchTool implements AITool {
         Map<String, Object> params = toolRequest.getParams();
         String content = (String) params.getOrDefault("content", "");
         String resourceType = (String) params.getOrDefault("resourceType", "web");
-        Integer topK = (Integer) params.getOrDefault("topK", "");
+        Object topKObj = params.getOrDefault("topK", 3);
+        Integer topK = topKObj instanceof Number ? ((Number) topKObj).intValue() : 3;
         List<String> sites = (List<String>) params.getOrDefault("sites", new ArrayList<>());
         String recency = (String) params.getOrDefault("recency", "semiyear");
         if(CollectionUtils.isEmpty(sites)){

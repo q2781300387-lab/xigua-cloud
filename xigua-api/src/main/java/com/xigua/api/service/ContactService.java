@@ -29,6 +29,14 @@ public interface ContactService {
     List<FriendVO> getFriendList();
 
     /**
+     * 获取按字母分组的好友列表
+     * @author wangjinfei
+     * @date 2026/4/15
+     * @return List<FriendGroupVO>
+     */
+    List<FriendGroupVO> firstLetterFriends();
+
+    /**
      * 获取群列表
      * @author wangjinfei
      * @date 2025/7/27 11:44
@@ -59,4 +67,11 @@ public interface ContactService {
      * @return List<FriendRequestVO>
     */
     List<FriendRequestVO> getReceiveFriendRequestList();
+
+    /**
+     * 撤回我发送且仍待处理的好友申请
+     * @param requestId 申请ID
+     * @return 是否撤回成功
+     */
+    Boolean withdrawFriendRequest(String requestId);
 }

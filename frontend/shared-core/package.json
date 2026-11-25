@@ -1,0 +1,10 @@
+{
+	"name": "@xigua/core",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"description": "西瓜 IM 两端共享业务核心：请求、API、消息模型与工具",
+	"main": "src/index.js",
+	"module": "src/index.js",
+	"sideEffects": false
+}

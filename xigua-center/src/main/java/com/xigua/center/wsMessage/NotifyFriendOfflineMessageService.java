@@ -2,7 +2,7 @@ package com.xigua.center.wsMessage;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.xigua.common.core.util.DateUtil;
-import com.xigua.common.core.util.RedisUtil;
+import com.xigua.common.redis.client.RedisClient;
 import com.xigua.domain.connect.Client;
 import com.xigua.domain.enums.Sender;
 import com.xigua.domain.ws.MessageRequest;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Component
 public class NotifyFriendOfflineMessageService extends AbstractMessageService {
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
     @Autowired
     private CenterService centerService;
 
@@ -60,7 +60,7 @@ public class NotifyFriendOfflineMessageService extends AbstractMessageService {
         String userId = messageRequest.getSenderId();
 
         // 获取和当前用户有好友关系的用户
-        Set<String> friendKeys = redisUtil.scanZSetKeysInMember(userId, RedisEnum.FRIEND_RELATION.getKey() + "*");
+        Set<String> friendKeys = redisClient.scanZSetKeysInMember(userId, RedisEnum.FRIEND_RELATION.getKey() + "*");
         if(CollectionUtils.isEmpty(friendKeys)){
             return;
         }
@@ -70,20 +70,14 @@ public class NotifyFriendOfflineMessageService extends AbstractMessageService {
                 .collect(Collectors.toSet());
         for (String friend : friends) {
             // 判断好友是否在线
-            String friendInServer = centerService.onlineUser(friend);
-            if(StringUtils.isEmpty(friendInServer)){
+            Client client = centerService.onlineUser(friend);
+            if(client == null){
                 continue;
             }
 
-            // 获取好友所在的节点信息
-            String key = RedisEnum.CLIENT_CONNECT_CENTER.getKey() +
-                    friendInServer.split(":")[1] + ":" + friendInServer.split(":")[2];
-            String value = redisUtil.get(key);
-            Client client = JSONObject.parseObject(value, Client.class);
-
             // 通知好友用户上线
             MessageResponse messageResponse = new MessageResponse();
-            messageResponse.setSenderId(Sender.SYSTEM.getSender());
+            messageResponse.setSenderId(userId);
             messageResponse.setReceiverId(friend);
             messageResponse.setMessage("");
             messageResponse.setMessageType(MessageType.NOTIFY.getType());

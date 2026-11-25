@@ -13,7 +13,7 @@ spring:
       # 端口
       port: 6379
       # 密码
-      password: 123456
+      password: CHANGE_ME
       # 读超时
       timeout: 5s
       # 连接超时
@@ -34,7 +34,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/xigua?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&useSSL=false
     username: root
-    password: 123456
+    password: CHANGE_ME
 
   kafka:
     # kafka集群信息，多个用逗号间隔
@@ -82,6 +82,17 @@ spring:
 
 
 dubbo:
+  application:
+    logger: slf4j
+    # 元数据中心 local 本地 remote 远程 这里使用远程便于其他服务获取
+    metadataType: remote
+    # 可选值 interface、instance、all，默认是 all，即接口级地址、应用级地址都注册
+    register-mode: instance
+    service-discovery:
+      # FORCE_INTERFACE，只消费接口级地址，如无地址则报错，单订阅 2.x 地址
+      # APPLICATION_FIRST，智能决策接口级/应用级地址，双订阅
+      # FORCE_APPLICATION，只消费应用级地址，如无地址则报错，单订阅 3.x 地址
+      migration: FORCE_APPLICATION
   scan:
     base-packages: com.xigua
   protocol:

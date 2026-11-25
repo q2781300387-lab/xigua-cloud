@@ -1,0 +1,372 @@
+/**
+ * Mobile IM Design System - Editorial Fluidity
+ *
+ * This design system emphasizes soft minimalism, tonal depth,
+ * and high-end editorial typography for instant messaging.
+ */
+
+/* ==================== COLOR TOKENS ==================== */
+
+/* Primary Colors */
+$primary: #005da7;
+$primary-container: #0076d1;
+$on-primary: #ffffff;
+$on-primary-container: #fdfcff;
+$primary-fixed: #d3e3ff;
+$primary-fixed-dim: #a3c9ff;
+$on-primary-fixed: #001c39;
+$on-primary-fixed-variant: #004883;
+
+/* Secondary Colors */
+$secondary: #3f608b;
+$secondary-container: #adceff;
+$on-secondary: #ffffff;
+$on-secondary-container: #365882;
+$secondary-fixed: #d3e3ff;
+$secondary-fixed-dim: #a8c8f9;
+$on-secondary-fixed: #001c39;
+$on-secondary-fixed-variant: #254872;
+
+/* Tertiary Colors */
+$tertiary: #944600;
+$tertiary-container: #ba5900;
+$on-tertiary: #ffffff;
+$on-tertiary-container: #fffbff;
+$tertiary-fixed: #ffdbc8;
+$tertiary-fixed-dim: #ffb689;
+$on-tertiary-fixed: #321300;
+$on-tertiary-fixed-variant: #743500;
+
+/* Error Colors */
+$error: #ba1a1a;
+$error-container: #ffdad6;
+$on-error: #ffffff;
+$on-error-container: #93000a;
+
+/* Surface Colors */
+$surface: #f7f9fc;
+$surface-bright: #f7f9fc;
+$surface-dim: #d8dadd;
+$surface-container: #eceef1;
+$surface-container-high: #e6e8eb;
+$surface-container-highest: #e0e3e6;
+$surface-container-low: #f2f4f7;
+$surface-container-lowest: #ffffff;
+$surface-variant: #e0e3e6;
+$surface-tint: #0060ab;
+
+/* On-Surface Colors */
+$on-surface: #191c1e;
+$on-surface-variant: #404753;
+
+/* Background Colors */
+$background: #f7f9fc;
+$on-background: #191c1e;
+
+/* Outline Colors */
+$outline: #707785;
+$outline-variant: #c0c7d5;
+
+/* Inverse Colors */
+$inverse-surface: #2d3133;
+$inverse-on-surface: #eff1f4;
+$inverse-primary: #a3c9ff;
+
+/* ==================== INTERACTIVE COLORS ==================== */
+/* For use in the actual implementation */
+$interactive-primary: #32ABFD; /* Brighter for better visibility */
+$interactive-hover: #0091FF;
+$interactive-pressed: #0076d1;
+
+/* ==================== TYPOGRAPHY TOKENS ==================== */
+
+/* Font Families */
+$font-headline: 'Manrope', 'PingFang SC', -apple-system, BlinkMacSystemFont, sans-serif;
+$font-body: 'Plus Jakarta Sans', 'PingFang SC', -apple-system, BlinkMacSystemFont, sans-serif;
+$font-label: 'Plus Jakarta Sans', 'PingFang SC', -apple-system, BlinkMacSystemFont, sans-serif;
+
+/* Display Scales */
+$display-lg: 114rpx; /* 3.5rem -> 57px -> 114rpx */
+$display-md: 90rpx;  /* 2.8125rem -> 45px -> 90rpx */
+$display-sm: 72rpx;  /* 2.25rem -> 36px -> 72rpx */
+
+/* Headline Scales */
+$headline-lg: 64rpx; /* 2rem -> 32px -> 64rpx */
+$headline-md: 56rpx; /* 1.75rem -> 28px -> 56rpx */
+$headline-sm: 48rpx; /* 1.5rem -> 24px -> 48rpx */
+
+/* Title Scales */
+$title-lg: 44rpx;    /* 1.375rem -> 22px -> 44rpx */
+$title-md: 32rpx;    /* 1rem -> 16px -> 32rpx */
+$title-sm: 28rpx;    /* 0.875rem -> 14px -> 28rpx */
+
+/* Body Scales */
+$body-lg: 32rpx;     /* 1rem -> 16px -> 32rpx */
+$body-md: 28rpx;     /* 0.875rem -> 14px -> 28rpx */
+$body-sm: 24rpx;     /* 0.75rem -> 12px -> 24rpx */
+
+/* Label Scales */
+$label-lg: 28rpx;    /* 0.875rem -> 14px -> 28rpx */
+$label-md: 24rpx;    /* 0.75rem -> 12px -> 24rpx */
+$label-sm: 22rpx;    /* 0.6875rem -> 11px -> 22rpx */
+
+/* Font Weights */
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+
+/* Line Heights */
+$line-height-tight: 1.2;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.6;
+$line-height-loose: 1.8;
+
+/* ==================== SPACING TOKENS ==================== */
+/* Base spacing scale (using 2x multiplier) */
+$space-0: 0rpx;
+$space-1: 8rpx;      /* 4px * 2 */
+$space-2: 16rpx;     /* 8px * 2 */
+$space-3: 24rpx;     /* 12px * 2 */
+$space-4: 32rpx;     /* 16px * 2 */
+$space-5: 40rpx;     /* 20px * 2 */
+$space-6: 48rpx;     /* 24px * 2 */
+$space-8: 64rpx;     /* 32px * 2 */
+$space-10: 80rpx;    /* 40px * 2 */
+$space-12: 96rpx;    /* 48px * 2 */
+$space-16: 128rpx;   /* 64px * 2 */
+$space-20: 160rpx;   /* 80px * 2 */
+$space-24: 192rpx;   /* 96px * 2 */
+
+/* ==================== BORDER RADIUS TOKENS ==================== */
+/* ROUND_FULL configuration */
+$radius-none: 0rpx;
+$radius-sm: 8rpx;     /* 0.25rem -> 4px -> 8rpx */
+$radius-base: 16rpx;  /* 0.5rem -> 8px -> 16rpx */
+$radius-md: 24rpx;    /* 0.75rem -> 12px -> 24rpx */
+$radius-lg: 32rpx;    /* 1rem -> 16px -> 32rpx */
+$radius-xl: 48rpx;    /* 1.5rem -> 24px -> 48rpx */
+$radius-2xl: 64rpx;   /* 2rem -> 32px -> 64rpx */
+$radius-3xl: 96rpx;   /* 3rem -> 48px -> 96rpx */
+$radius-full: 9999rpx; /* Full rounded */
+
+/* ==================== SHADOW TOKENS ==================== */
+/* Ambient Shadows with blue tint */
+$shadow-sm: 0 4rpx 16rpx rgba(0, 93, 167, 0.04);
+$shadow-md: 0 8rpx 24rpx rgba(0, 93, 167, 0.06);
+$shadow-lg: 0 16rpx 48rpx rgba(0, 93, 167, 0.08);
+$shadow-xl: 0 24rpx 64rpx rgba(0, 93, 167, 0.1);
+
+/* Editorial Shadow */
+$shadow-editorial: 0 24rpx 64rpx rgba(30, 27, 19, 0.04);
+
+/* Interactive Shadows */
+$shadow-primary: 0 16rpx 48rpx rgba(50, 171, 253, 0.2);
+$shadow-primary-lg: 0 24rpx 64rpx rgba(50, 171, 253, 0.3);
+
+/* ==================== ELEVATION TOKENS ==================== */
+/* Using tonal layering instead of traditional shadows */
+$elevation-0: $surface-container-lowest; /* White */
+$elevation-1: $surface-container-low;    /* Very light grey */
+$elevation-2: $surface-container;        /* Light grey */
+$elevation-3: $surface-container-high;   /* Medium grey */
+$elevation-4: $surface-container-highest; /* Dark grey */
+
+/* ==================== TRANSITION TOKENS ==================== */
+$transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-slower: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+/* Easing Functions */
+$ease-in: cubic-bezier(0.4, 0, 1, 1);
+$ease-out: cubic-bezier(0, 0, 0.2, 1);
+$ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+/* ==================== Z-INDEX TOKENS ==================== */
+$z-base: 0;
+$z-dropdown: 10;
+$z-sticky: 20;
+$z-fixed: 30;
+$z-modal-backdrop: 40;
+$z-modal: 50;
+$z-popover: 60;
+$z-tooltip: 70;
+
+/* ==================== BREAKPOINTS ==================== */
+/* Mobile-first approach */
+$breakpoint-xs: 320rpx;  /* Extra small devices */
+$breakpoint-sm: 640rpx;  /* Small devices */
+$breakpoint-md: 750rpx;  /* Medium devices (standard mobile) */
+$breakpoint-lg: 1024rpx; /* Large devices (tablets) */
+$breakpoint-xl: 1280rpx; /* Extra large devices */
+
+/* ==================== COMPONENT-SPECIFIC TOKENS ==================== */
+
+/* Touch Targets */
+$touch-target-min: 88rpx; /* 44px * 2 - minimum touch target */
+
+/* Avatar Sizes */
+$avatar-xs: 48rpx;
+$avatar-sm: 64rpx;
+$avatar-md: 96rpx;
+$avatar-lg: 128rpx;
+$avatar-xl: 192rpx;
+
+/* Icon Sizes */
+$icon-xs: 32rpx;
+$icon-sm: 40rpx;
+$icon-md: 48rpx;
+$icon-lg: 64rpx;
+$icon-xl: 96rpx;
+
+/* Button Heights */
+$button-sm: 64rpx;
+$button-md: 88rpx;
+$button-lg: 104rpx;
+
+/* Input Heights */
+$input-sm: 64rpx;
+$input-md: 88rpx;
+$input-lg: 104rpx;
+
+/* Header Heights */
+$header-height: 128rpx; /* 64px * 2 */
+$header-height-with-status: calc(var(--status-bar-height) + 128rpx);
+
+/* Bottom Navigation Heights */
+$bottom-nav-height: 128rpx;
+$bottom-nav-height-with-safe: calc(128rpx + env(safe-area-inset-bottom));
+
+/* ==================== MIXINS ==================== */
+
+/* Glassmorphism Effect */
+@mixin glassmorphism($opacity: 0.7, $blur: 48rpx) {
+	background-color: rgba(255, 255, 255, $opacity);
+	backdrop-filter: blur($blur);
+	-webkit-backdrop-filter: blur($blur);
+}
+
+/* Text Truncation */
+@mixin text-ellipsis {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* Multi-line Truncation */
+@mixin text-clamp($lines: 2) {
+	display: -webkit-box;
+	-webkit-line-clamp: $lines;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+/* Flexbox Center */
+@mixin flex-center {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Absolute Fill */
+@mixin absolute-fill {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+/* Interactive State */
+@mixin interactive-state {
+	transition: all $transition-base;
+	cursor: pointer;
+
+	&:hover {
+		opacity: 0.8;
+	}
+
+	&:active {
+		transform: scale(0.95);
+		opacity: 0.7;
+	}
+}
+
+/* Soft Shadow */
+@mixin soft-shadow($color: $primary) {
+	box-shadow: 0 8rpx 24rpx rgba($color, 0.06);
+}
+
+/* Editorial Card */
+@mixin editorial-card {
+	background-color: $surface-container-lowest;
+	border-radius: $radius-2xl;
+	box-shadow: $shadow-editorial;
+}
+
+/* ==================== UTILITY CLASSES ==================== */
+
+/* These can be imported globally or used with @extend */
+
+.text-primary { color: $primary; }
+.text-secondary { color: $secondary; }
+.text-on-surface { color: $on-surface; }
+.text-on-surface-variant { color: $on-surface-variant; }
+.text-error { color: $error; }
+
+.bg-primary { background-color: $primary; }
+.bg-surface { background-color: $surface; }
+.bg-surface-container { background-color: $surface-container; }
+.bg-surface-container-low { background-color: $surface-container-low; }
+.bg-surface-container-lowest { background-color: $surface-container-lowest; }
+
+.font-headline { font-family: $font-headline; }
+.font-body { font-family: $font-body; }
+.font-label { font-family: $font-label; }
+
+.rounded-sm { border-radius: $radius-sm; }
+.rounded-md { border-radius: $radius-md; }
+.rounded-lg { border-radius: $radius-lg; }
+.rounded-xl { border-radius: $radius-xl; }
+.rounded-2xl { border-radius: $radius-2xl; }
+.rounded-3xl { border-radius: $radius-3xl; }
+.rounded-full { border-radius: $radius-full; }
+
+.shadow-sm { box-shadow: $shadow-sm; }
+.shadow-md { box-shadow: $shadow-md; }
+.shadow-lg { box-shadow: $shadow-lg; }
+.shadow-xl { box-shadow: $shadow-xl; }
+
+/* ==================== DESIGN PRINCIPLES ==================== */
+
+/*
+ * 1. NO HARD BORDERS
+ *    Use color shifts and tonal layering instead of 1px solid borders.
+ *    If a border is absolutely necessary, use outline-variant at 15% opacity.
+ *
+ * 2. GLASSMORPHISM FOR FLOATING ELEMENTS
+ *    Use semi-transparent backgrounds with backdrop blur for headers,
+ *    navigation bars, and modal overlays.
+ *
+ * 3. AMBIENT SHADOWS
+ *    Shadows should be extra-diffused with a blue tint to mimic natural
+ *    light refraction. Avoid dark, "smudgy" shadows.
+ *
+ * 4. EDITORIAL TYPOGRAPHY
+ *    Use generous type scales for headers. Ensure body text has adequate
+ *    line height (1.5x+) to prevent crowding.
+ *
+ * 5. WHITESPACE AS SEPARATOR
+ *    Use padding and margin generously. If you think you need a line,
+ *    try adding 8px (16rpx) of spacing instead.
+ *
+ * 6. SOFT COLOR PALETTE
+ *    Avoid pure black (#000000). Use on-surface (#191c1e) for primary text.
+ *    Background should have a cool tint (#f7f9fc) to prevent eye strain.
+ *
+ * 7. MINIMUM TOUCH TARGETS
+ *    All interactive elements must be at least 44x44pt (88rpx).
+ *    Add adequate spacing (12px/24rpx minimum) between interactive elements.
+ */

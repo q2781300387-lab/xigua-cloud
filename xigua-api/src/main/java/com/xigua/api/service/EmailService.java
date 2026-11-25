@@ -27,4 +27,14 @@ public interface EmailService {
      * @return Boolean
     */
     Boolean checkCode(String email, String code);
+
+    /**
+     * 验证重置密码验证码
+     * @author wangjinfei
+     * @date 2026/4/13
+     * @param email 邮箱地址
+     * @param code 验证码
+     * @return String 重置密码临时token
+    */
+    String verifyResetCode(String email, String code);
 }

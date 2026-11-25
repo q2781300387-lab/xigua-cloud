@@ -21,4 +21,14 @@ public interface GroupMemberMapper extends BaseMapper<GroupMember> {
      * @return Integer
      */
     Integer getCountByUserId(String userId);
+
+    /**
+     * 根据用户ID查询截止昨日加入的群组数量
+     * @author wangjinfei
+     * @date 2026/3/10
+     * @param userId 用户ID
+     * @param yesterdayEnd 昨日结束时间
+     * @return Integer
+     */
+    Integer getCountByUserIdBeforeTime(String userId, String yesterdayEnd);
 }

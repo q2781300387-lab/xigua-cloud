@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xigua.client.mapper.UserResourceQuotaMapper">
+
+
+    <select id="getByUserId" resultType="com.xigua.domain.entity.UserResourceQuota">
+        select id,
+               user_id,
+               used_size,
+               used_count,
+               max_total_size,
+               max_file_size,
+               del_flag,
+               create_by,
+               create_time,
+               update_by,
+               update_time
+        from xg_user_resource_quota
+        where del_flag = 0
+          and user_id = #{userId}
+            limit 1
+    </select>
+</mapper>

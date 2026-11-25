@@ -1,7 +1,7 @@
 package com.xigua.ai.tool;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.xigua.ai.enums.Prompt;
+import com.xigua.ai.domain.enums.Prompt;
 import com.xigua.ai.llm.LLMService;
 import com.xigua.ai.llm.model.ChatContext;
 import com.xigua.ai.tool.model.ToolSelectionResult;
@@ -11,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
-
-import java.io.IOException;
 
 /**
  * @ClassName ToolSelector

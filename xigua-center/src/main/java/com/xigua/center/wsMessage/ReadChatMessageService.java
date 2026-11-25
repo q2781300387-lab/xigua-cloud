@@ -1,24 +1,19 @@
 package com.xigua.center.wsMessage;
 
 import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
 import com.xigua.api.service.MessageReadService;
 import com.xigua.center.chatMessage.AbstractReadChatMessageService;
 import com.xigua.center.chatMessage.ReadChatMessageServiceFactory;
-import com.xigua.common.core.util.DateUtil;
-import com.xigua.common.core.util.RedisUtil;
-import com.xigua.domain.connect.Client;
+import com.xigua.common.redis.client.RedisClient;
 import com.xigua.domain.ws.MessageRequest;
 import com.xigua.domain.enums.*;
 import com.xigua.api.service.CenterService;
 import com.xigua.api.service.ChatMessageService;
-import com.xigua.domain.ws.MessageResponse;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -32,7 +27,7 @@ public class ReadChatMessageService extends AbstractMessageService {
     @Autowired
     private ChatMessageService chatMessageService;
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
     @Autowired
     private CenterService centerService;
     @Autowired

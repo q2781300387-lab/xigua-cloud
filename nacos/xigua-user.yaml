@@ -19,7 +19,7 @@ spring:
       # 端口
       port: 6379
       # 密码
-      password: 123456
+      password: CHANGE_ME
       # 读超时
       timeout: 5s
       # 连接超时
@@ -29,12 +29,12 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/xigua?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password: 123456
+    password: CHANGE_ME
   cloud:
     nacos:
       server-addr: 127.0.0.1:8848
       username: nacos
-      password: nacos
+      password: CHANGE_ME
       discovery:
         namespace: xigua
       config:

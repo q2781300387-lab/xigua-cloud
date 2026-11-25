@@ -3,14 +3,14 @@ package com.xigua.ai.controller;
 import com.xigua.ai.client.DeepSeekClient;
 import com.xigua.ai.openai.ChatCompletionRequest;
 import com.xigua.ai.openai.ChatCompletionResponse;
-import com.xigua.ai.service.AIServiceImpl;
 import com.xigua.ai.sse.StreamCallback;
 import com.xigua.ai.tool.WebSearchTool;
 import com.xigua.ai.tool.model.ToolRequest;
 import com.xigua.api.service.*;
-import com.xigua.domain.result.R;
+import com.xigua.common.core.base.R;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,7 +47,8 @@ public class AITestController {
     private WebSearchTool webSearchTool;
 
     @ApiResponses({@ApiResponse(responseCode = "200", description = "查询成功", content =
-            { @Content(mediaType = "application/json") })})
+            { @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ChatCompletionResponse.class)) })})
     @Operation(summary = "测试接口")
     @PostMapping("/testChat")
     public R<ChatCompletionResponse> testChat() throws IOException {

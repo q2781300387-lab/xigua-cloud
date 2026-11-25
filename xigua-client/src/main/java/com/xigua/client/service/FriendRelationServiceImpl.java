@@ -4,12 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xigua.client.mapper.FriendRelationMapper;
 import com.xigua.common.core.exception.BusinessException;
-import com.xigua.common.core.util.RedisUtil;
 import com.xigua.common.core.util.UserContext;
+import com.xigua.common.redis.client.RedisClient;
 import com.xigua.common.sequence.sequence.Sequence;
 import com.xigua.domain.ws.MessageRequest;
 import com.xigua.domain.dto.FriendVerifyDTO;
-import com.xigua.domain.dto.sendFriendRequestDTO;
+import com.xigua.domain.dto.SendFriendRequestDTO;
 import com.xigua.domain.entity.FriendRelation;
 import com.xigua.domain.entity.FriendRequest;
 import com.xigua.domain.entity.User;
@@ -49,7 +49,7 @@ public class FriendRelationServiceImpl extends ServiceImpl<FriendRelationMapper,
     @Autowired
     private UserService userService;
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
     @DubboReference
     private CenterService centerService;
 
@@ -61,7 +61,7 @@ public class FriendRelationServiceImpl extends ServiceImpl<FriendRelationMapper,
      * @return Boolean
      */
     @Override
-    public Boolean sendFriendRequest(sendFriendRequestDTO dto) {
+    public Boolean sendFriendRequest(SendFriendRequestDTO dto) {
         String userId = UserContext.get().getUserId();
         String friendId = dto.getFriendId();
         // 检查好友关系
@@ -98,6 +98,15 @@ public class FriendRelationServiceImpl extends ServiceImpl<FriendRelationMapper,
                 .eq(FriendRelation::getFriendId, friendId));
         if (count > 0) {
             throw new BusinessException("已经是好友关系");
+        }
+
+        // 检查是否已经有待处理的好友请求
+        Long pendingCount = friendRequestService.count(new LambdaQueryWrapper<FriendRequest>()
+                .eq(FriendRequest::getSenderId, userId)
+                .eq(FriendRequest::getReceiverId, friendId)
+                .eq(FriendRequest::getFlowStatus, FriendRequestFlowStatus.ZERO.getStatus()));
+        if (pendingCount > 0) {
+            throw new BusinessException("已有待处理的好友请求，请勿重复申请");
         }
     }
 
@@ -177,7 +186,7 @@ public class FriendRelationServiceImpl extends ServiceImpl<FriendRelationMapper,
         boolean save = save(friendRelation);
 
         // 缓存好友关系
-        redisUtil.zsadd(RedisEnum.FRIEND_RELATION.getKey() + userId, friendId, System.currentTimeMillis());
+        redisClient.zsadd(RedisEnum.FRIEND_RELATION.getKey() + userId, friendId, System.currentTimeMillis());
     }
 
     /**
@@ -195,6 +204,7 @@ public class FriendRelationServiceImpl extends ServiceImpl<FriendRelationMapper,
         messageRequest.setMessageType(MessageType.CHAT.getType());
         messageRequest.setSubType(MessageSubType.MES_SEND.getType());
         messageRequest.setMessage("你已成为我的好友");
+        messageRequest.setChatType(ChatType.PRIVATE.getType());
         messageRequest.setCreateTime(String.valueOf(System.currentTimeMillis()));
         centerService.receiveMessage4Client(messageRequest);
     }
@@ -258,7 +268,7 @@ public class FriendRelationServiceImpl extends ServiceImpl<FriendRelationMapper,
             for (FriendRelation friendRelation : friendList) {
                 String friendId = friendRelation.getFriendId();
                 // 缓存好友关系
-                redisUtil.zsadd(RedisEnum.FRIEND_RELATION.getKey() + userId, friendId, System.currentTimeMillis());
+                redisClient.zsadd(RedisEnum.FRIEND_RELATION.getKey() + userId, friendId, System.currentTimeMillis());
             }
         }
     }
@@ -290,7 +300,12 @@ public class FriendRelationServiceImpl extends ServiceImpl<FriendRelationMapper,
 
         // 从缓存中获取好友id列表
         friendIds = getFriendIdsByUserIdFromRedis(userId);
-        if(CollectionUtils.isNotEmpty(friendIds)){
+        Integer relationCount = baseMapper.getCountByUserId(userId);
+        // 缓存里的关系数必须和数据库一致；Redis 重启/淘汰后可能只剩部分关系，
+        // 只认缓存会让“好友 (7)”下面只展开 1 行
+        if(CollectionUtils.isNotEmpty(friendIds)
+                && relationCount != null
+                && friendIds.size() == relationCount){
             return friendIds;
         }
 
@@ -305,6 +320,11 @@ public class FriendRelationServiceImpl extends ServiceImpl<FriendRelationMapper,
                 .map(friendRelation -> friendRelation.getFriendId())
                 .collect(Collectors.toList());
 
+        // 用数据库结果修复不完整的好友关系缓存
+        for (String friendId : friendIds) {
+            redisClient.zsadd(RedisEnum.FRIEND_RELATION.getKey() + userId, friendId, System.currentTimeMillis());
+        }
+
         return friendIds;
     }
 
@@ -318,7 +338,7 @@ public class FriendRelationServiceImpl extends ServiceImpl<FriendRelationMapper,
     private List<String> getFriendIdsByUserIdFromRedis(String userId) {
         List<String> friendIds = new ArrayList<>();
 
-        Set<Object> friendIdsInRedis = redisUtil.zsReverseRange(RedisEnum.FRIEND_RELATION.getKey() + userId, 0, -1);
+        Set<Object> friendIdsInRedis = redisClient.zsReverseRange(RedisEnum.FRIEND_RELATION.getKey() + userId, 0, -1);
         if(CollectionUtils.isNotEmpty(friendIdsInRedis)){
             friendIds = friendIdsInRedis.stream()
                     .map(friendId -> friendId.toString())
@@ -366,15 +386,15 @@ public class FriendRelationServiceImpl extends ServiceImpl<FriendRelationMapper,
         }
 
         // 从缓存中删除好友关系
-        redisUtil.zsrem(RedisEnum.FRIEND_RELATION.getKey() + userId, friendId);
+        redisClient.zsrem(RedisEnum.FRIEND_RELATION.getKey() + userId, friendId);
 
         // 缓存删除消息列表
-        if(redisUtil.isExistInZSet(RedisEnum.LAST_MES.getKey() + userId, friendId)){
-            redisUtil.zsrem(RedisEnum.LAST_MES.getKey() + userId, friendId);
+        if(redisClient.isExistInZSet(RedisEnum.LAST_MES.getKey() + userId, friendId)){
+            redisClient.zsrem(RedisEnum.LAST_MES.getKey() + userId, friendId);
         }
         // 缓存删除消息内容
-        if(redisUtil.isExistInHash(RedisEnum.LAST_MES_CONTENT.getKey() + userId, friendId)){
-            redisUtil.hashDel(RedisEnum.LAST_MES_CONTENT.getKey() + userId, friendId);
+        if(redisClient.isExistInHash(RedisEnum.LAST_MES_CONTENT.getKey() + userId, friendId)){
+            redisClient.hashDel(RedisEnum.LAST_MES_CONTENT.getKey() + userId, friendId);
         }
 
         return true;
@@ -390,7 +410,20 @@ public class FriendRelationServiceImpl extends ServiceImpl<FriendRelationMapper,
      */
     @Override
     public Boolean isFriend(String userId, String friendId) {
-        Boolean isFriend = redisUtil.isExistInZSet(RedisEnum.FRIEND_RELATION.getKey() + userId, friendId);
+        Boolean isFriend = redisClient.isExistInZSet(RedisEnum.FRIEND_RELATION.getKey() + userId, friendId);
+        // Redis 缓存未命中时回查数据库兜底，防止缓存清空/未预热导致误判为“不是好友”
+        if (!Boolean.TRUE.equals(isFriend)) {
+            Long count = baseMapper.selectCount(new LambdaQueryWrapper<FriendRelation>()
+                    .eq(FriendRelation::getUserId, userId)
+                    .eq(FriendRelation::getFriendId, friendId)
+                    .eq(FriendRelation::getDelFlag, 0));
+            if (count != null && count > 0) {
+                // 命中后写回缓存（序列化格式与 RedisTemplate 一致）
+                redisClient.zsadd(RedisEnum.FRIEND_RELATION.getKey() + userId, friendId, System.currentTimeMillis());
+                return true;
+            }
+            return false;
+        }
         return isFriend;
     }
 }

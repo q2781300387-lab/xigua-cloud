@@ -1,6 +1,6 @@
 package com.xigua.domain.dto;
 
-import com.xigua.domain.result.BasePageDTO;
+import com.xigua.common.mybatis.base.BasePageDTO;
 import lombok.Data;
 
 import java.io.Serializable;

@@ -1,6 +1,6 @@
 package com.xigua.center.wsMessage;
 
-import com.xigua.common.core.util.RedisUtil;
+import com.xigua.common.redis.client.RedisClient;
 import com.xigua.domain.ws.MessageRequest;
 import com.xigua.domain.enums.MessageSubType;
 import com.xigua.domain.enums.MessageType;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class NotifySwitchChatWindowMessageService extends AbstractMessageService {
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
 
     @Override
     public String getMessageName() {
@@ -40,6 +40,6 @@ public class NotifySwitchChatWindowMessageService extends AbstractMessageService
         String receiverId = messageRequest.getReceiverId();
 
         // 更新当前聊天窗口
-        redisUtil.set(RedisEnum.CURRENT_CHAT_WINDOW.getKey() + userId, receiverId);
+        redisClient.set(RedisEnum.CURRENT_CHAT_WINDOW.getKey() + userId, receiverId);
     }
 }

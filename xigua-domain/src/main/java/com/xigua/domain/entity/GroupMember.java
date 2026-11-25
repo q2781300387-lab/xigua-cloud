@@ -23,58 +23,65 @@ public class GroupMember implements Serializable {
     /**
      * 主键id
      */
-    @Schema(name = "主键id")
+    @Schema(description = "主键id")
     @TableId(value = "id")
     private String id;
 
     /**
      * 群组id
      */
-    @Schema(name = "群组id")
+    @Schema(description = "群组id")
     private String groupId;
 
     /**
      * 用户id
      */
-    @Schema(name = "用户id")
+    @Schema(description = "用户id")
     private String userId;
 
     /**
      * 群内昵称
      */
-    @Schema(name = "群内昵称")
+    @Schema(description = "群内昵称")
     private String nickname;
 
     /**
      * 状态（0：已退出；1：正常）
      */
-    @Schema(name = "状态（0：已退出；1：正常）")
+    @Schema(description = "状态（0：已退出；1：正常）")
     private Integer status;
 
     /**
      * 群内角色（1：群主；2：群管理；3：普通成员）
      */
-    @Schema(name = "群内角色（1：群主；2：群管理；3：普通成员）")
+    @Schema(description = "群内角色（1：群主；2：群管理；3：普通成员）")
     private Integer role;
+
+    /**
+     * 单人禁言截止时间（null 或早于当前时间表示未禁言；群主/管理员不受此字段限制）
+     */
+    @Schema(description = "单人禁言截止时间")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime muteUntil;
 
     /**
      * 是否删除 （0：未删除；1：已删除）
      */
-    @Schema(name = "是否删除 （0：未删除；1：已删除）")
+    @Schema(description = "是否删除 （0：未删除；1：已删除）")
     @TableLogic
     private Integer delFlag;
 
     /**
      * 创建人
      */
-    @Schema(name = "创建人")
+    @Schema(description = "创建人")
     @TableField(fill = FieldFill.INSERT)
     private String createBy;
 
     /**
      * 创建时间
      */
-    @Schema(name = "创建时间")
+    @Schema(description = "创建时间")
     @TableField(fill = FieldFill.INSERT)
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
@@ -82,14 +89,14 @@ public class GroupMember implements Serializable {
     /**
      * 修改人
      */
-    @Schema(name = "修改人")
+    @Schema(description = "修改人")
     @TableField(fill = FieldFill.UPDATE)
     private String updateBy;
 
     /**
      * 修改时间
      */
-    @Schema(name = "修改时间")
+    @Schema(description = "修改时间")
     @TableField(fill = FieldFill.UPDATE)
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;

@@ -2,7 +2,7 @@ package com.xigua.center.wsMessage;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.xigua.common.core.util.DateUtil;
-import com.xigua.common.core.util.RedisUtil;
+import com.xigua.common.redis.client.RedisClient;
 import com.xigua.domain.connect.Client;
 import com.xigua.domain.ws.MessageRequest;
 import com.xigua.domain.enums.MessageSubType;
@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 @Component
 public class HeartBeatPingMessageService extends AbstractMessageService {
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
     @Autowired
     private CenterService centerService;
 
@@ -50,7 +50,7 @@ public class HeartBeatPingMessageService extends AbstractMessageService {
         String userId = messageRequest.getSenderId();
 
         // 更新最后心跳时间
-        redisUtil.set(RedisEnum.LAST_PING_TIME.getKey() + userId, String.valueOf(System.currentTimeMillis()));
+        redisClient.set(RedisEnum.LAST_PING_TIME.getKey() + userId, String.valueOf(System.currentTimeMillis()));
 
         // 发送心跳回复
         resPong(userId);
@@ -68,16 +68,10 @@ public class HeartBeatPingMessageService extends AbstractMessageService {
     */
     private void resPong(String senderId){
         // 获取接收者所在节点
-        String userInServer = centerService.onlineUser(senderId);
-        if(StringUtils.isEmpty(userInServer)){
+        Client client = centerService.onlineUser(senderId);
+        if(client == null){
             return;
         }
-
-        // 获取接收者所在的节点信息
-        String key = RedisEnum.CLIENT_CONNECT_CENTER.getKey() +
-                userInServer.split(":")[1] + ":" + userInServer.split(":")[2];
-        String value = redisUtil.get(key);
-        Client client = JSONObject.parseObject(value, Client.class);
 
         // 发送心跳回复
         MessageResponse messageResponse = new MessageResponse();

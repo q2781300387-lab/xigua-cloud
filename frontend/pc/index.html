@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="西瓜IM - 清爽高效的即时通讯" />
+    <meta name="keywords" content="西瓜IM,即时通讯,社交,聊天" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="西瓜IM" />
+    <title>西瓜IM</title>
+
+    <style>
+        /* 全局西瓜主题变量 */
+        :root {
+            --watermelon-red: #ff4c4c;
+            --watermelon-green: #2ecc71;
+            --seed-black: #333;
+            --watermelon-pink: #ff9bb3;
+            --watermelon-light: #f8f8f8;
+        }
+
+        /* 基础样式重置 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--watermelon-light);
+            color: #333;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Vue挂载点样式 */
+        #app {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 加载动画 - 西瓜主题 */
+        .app-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            z-index: 9999;
+            flex-direction: column;
+        }
+        .watermelon-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--watermelon-green);
+            border-top-color: var(--watermelon-red);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            margin-top: 20px;
+            color: var(--watermelon-green);
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+<!-- 加载状态（Vue挂载后会自动移除） -->
+<div id="app-loading" class="app-loading">
+    <div class="watermelon-spinner"></div>
+    <div class="loading-text">西瓜IM 加载中...</div>
+</div>
+
+<!-- Vue挂载点 -->
+<div id="app"></div>
+
+<script type="module" src="/src/main.js"></script>
+
+<script>
+    // Service Worker 仅在正式环境注册：localhost 是开发服务器，
+    // 热更新产物与 SW 缓存会互相污染（旧 index.html 引用已删除的旧 hash → 整页白屏且不会自愈）
+    var isDevHost = /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/.test(location.hostname) || location.port === '5102';
+
+    if ('serviceWorker' in navigator) {
+        if (isDevHost) {
+            // 开发环境主动注销历史注册并清空缓存，避免旧 SW 继续接管页面
+            navigator.serviceWorker.getRegistrations().then(function (list) {
+                list.forEach(function (r) { r.unregister(); });
+            }).catch(function () {});
+            if (window.caches && caches.keys) {
+                caches.keys().then(function (keys) {
+                    keys.forEach(function (k) { caches.delete(k); });
+                }).catch(function () {});
+            }
+        } else {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/sw.js').then(function (reg) {
+                    // 每次加载都主动检查新版本，避免长期停在旧产物
+                    try { reg.update(); } catch (e) {}
+                    // 检测到新版本就绪 → 提示刷新
+                    reg.addEventListener('updatefound', function () {
+                        var nw = reg.installing;
+                        if (!nw) return;
+                        nw.addEventListener('statechange', function () {
+                            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                                showUpdateBanner();
+                            }
+                        });
+                    });
+                }).catch(function () {});
+            });
+        }
+    }
+
+    function showUpdateBanner() {
+        var banner = document.getElementById('app-update-banner');
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.id = 'app-update-banner';
+            banner.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);z-index:100000;display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:13px;background:rgba(28,28,30,0.82);backdrop-filter:blur(20px) saturate(1.6);-webkit-backdrop-filter:blur(20px) saturate(1.6);color:#fff;font-size:13px;box-shadow:0 8px 32px rgba(0,0,0,0.25);opacity:0;transition:opacity .35s ease,transform .45s cubic-bezier(.34,1.3,.64,1);';
+            var text = document.createElement('span');
+            text.textContent = '发现新版本';
+            var btn = document.createElement('button');
+            btn.textContent = '立即刷新';
+            btn.style.cssText = 'border:0;border-radius:9px;padding:6px 14px;background:#34c759;color:#fff;font-size:12.5px;font-weight:600;cursor:pointer;';
+            btn.onclick = function () { location.reload(); };
+            banner.appendChild(text);
+            banner.appendChild(btn);
+            document.body.appendChild(banner);
+            requestAnimationFrame(function () {
+                banner.style.opacity = '1';
+                banner.style.transform = 'translateX(-50%) translateY(0)';
+            });
+        } else {
+            banner.style.display = 'flex';
+            requestAnimationFrame(function () {
+                banner.style.opacity = '1';
+                banner.style.transform = 'translateX(-50%) translateY(0)';
+            });
+        }
+    }
+
+    // 加载完成后移除loading
+    window.addEventListener('load', function() {
+        const loading = document.getElementById('app-loading');
+        if (loading) {
+            setTimeout(() => {
+                loading.style.opacity = 0;
+                setTimeout(() => loading.remove(), 300);
+            }, 300);
+        }
+    });
+</script>
+</body>
+</html>
